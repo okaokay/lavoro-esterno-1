@@ -1,0 +1,425 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Lavoro Esterno - Sources</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f2f3ff",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "on-tertiary-container": "#ffede6",
+                        "info": "#0ea5e9",
+                        "on-surface": "#131b2e",
+                        "on-surface-variant": "#434655",
+                        "border": "#e2e8f0",
+                        "on-primary-container": "#eeefff",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "muted": "#f1f5f9",
+                        "on-tertiary-fixed": "#360f00",
+                        "tertiary-fixed": "#ffdbcd",
+                        "primary": "#004ac6",
+                        "surface-bright": "#faf8ff",
+                        "surface-container-highest": "#dae2fd",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-tint": "#0053db",
+                        "primary-container": "#2563eb",
+                        "tertiary-container": "#bc4800",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-background": "#131b2e",
+                        "surface": "#faf8ff",
+                        "on-secondary-container": "#57657a",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b4c5ff",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "outline": "#737686",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#faf8ff",
+                        "tertiary": "#943700",
+                        "surface-variant": "#dae2fd",
+                        "secondary": "#515f74",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d2d9f4",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container": "#eaedff",
+                        "warning": "#f59e0b",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "error": "#ef4444",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "secondary-container": "#d5e3fc",
+                        "surface-container-high": "#e2e7ff",
+                        "success": "#10b981",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-surface": "#283044",
+                        "outline-variant": "#c3c6d7",
+                        "inverse-on-surface": "#eef0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-page": "24px",
+                        "sidebar-collapsed": "64px",
+                        "base": "4px",
+                        "sidebar-width": "260px",
+                        "topbar-height": "56px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "mono-data": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["18px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-sidebar-width bg-surface-container-lowest border-r border-border flex flex-col py-4 z-50">
+<!-- Brand -->
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary" data-weight="fill">database</span>
+</div>
+<div>
+<h1 class="text-headline-sm font-headline-sm text-primary tracking-tight">Lavoro Esterno</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Enterprise Data</p>
+</div>
+</div>
+<!-- Main Navigation -->
+<div class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="dashboard">dashboard</span>
+<span class="text-body-md font-body-md group-hover:text-on-surface transition-colors">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="search">search</span>
+<span class="text-body-md font-body-md group-hover:text-on-surface transition-colors">Search</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="database">database</span>
+<span class="text-body-md font-body-md group-hover:text-on-surface transition-colors">Records</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-secondary-container text-on-secondary-container font-semibold opacity-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="source" data-weight="fill">source</span>
+<span class="text-body-md font-body-md">Sources</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="cloud_download">cloud_download</span>
+<span class="text-body-md font-body-md group-hover:text-on-surface transition-colors">Exports</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="settings">settings</span>
+<span class="text-body-md font-body-md group-hover:text-on-surface transition-colors">Admin</span>
+</a>
+</div>
+<!-- Footer Navigation -->
+<div class="px-4 mt-auto space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="account_circle">account_circle</span>
+<span class="text-body-md font-body-md group-hover:text-on-surface transition-colors">Profile</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="logout">logout</span>
+<span class="text-body-md font-body-md group-hover:text-on-surface transition-colors">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-sidebar-width flex flex-col h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-40 bg-surface border-b border-border h-topbar-height">
+<!-- Left: Breadcrumb/Search -->
+<div class="flex items-center flex-1">
+<div class="flex items-center gap-2 text-on-secondary-container text-body-md font-body-md">
+<span>Lavoro Esterno</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="font-semibold text-primary">Sources</span>
+</div>
+</div>
+<!-- Right: Actions -->
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-secondary-container hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded-full">
+<span class="material-symbols-outlined" data-icon="sensors">sensors</span>
+</button>
+<button class="p-2 text-on-secondary-container hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded-full relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="h-6 w-px bg-border mx-2"></div>
+<button class="text-body-md font-body-md text-on-secondary-container hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container px-2 py-1 rounded-lg">Support</button>
+<button class="flex items-center gap-2 text-body-md font-body-md text-on-secondary-container hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container pl-2 py-1 rounded-lg">
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-border object-cover" data-alt="A small, professional headshot of an enterprise user, clean white background, high resolution, minimalist B2B style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6Fn9UcPMAuSiFuzE1Zb6h3pyQfufNRVAx6W9fUftZviiffAQsl_zhYH2OBEQQkDhJvRaL7x2pRAidECstG7JmBsTPDret_pD7DNWEhMi7JqOPxMUxJTTa8gvlzAWdFTk4IxMu8cH2clX6uwNfSiYC3CS6A9cvlYMr8lcLAlVhiSKQnoHEGiknzHTbUx90wX5PrybDx1c3U5l71WGQPfTdZ_sYH-Qs-tA3M6tmm2PwlgtFVkcwkWuWzQ">
+                    Account
+                    <span class="material-symbols-outlined text-sm">arrow_drop_down</span>
+</button>
+</div>
+</header>
+<!-- Page Canvas -->
+<main class="flex-1 overflow-y-auto p-margin-page bg-background">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="text-headline-lg font-headline-lg text-on-surface">Data Sources</h2>
+<p class="text-body-md font-body-md text-on-surface-variant mt-1">Manage, monitor, and configure active external data pipelines.</p>
+</div>
+<div class="flex gap-3">
+<button class="h-10 px-4 rounded border border-border text-on-surface bg-surface-container-lowest hover:bg-surface-container-low flex items-center gap-2 text-body-md font-body-md transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                        Filter
+                    </button>
+<button class="h-10 px-4 rounded bg-primary text-on-primary hover:bg-on-primary-fixed-variant flex items-center gap-2 text-body-md font-body-md shadow-sm transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+                        Add Source
+                    </button>
+</div>
+</div>
+<!-- Summary Cards -->
+<div class="grid grid-cols-4 gap-4 mb-6">
+<div class="bg-surface-container-lowest border border-border rounded-lg p-4 shadow-sm border-t-2 border-t-primary">
+<h3 class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Total Sources</h3>
+<div class="text-headline-md font-headline-md text-on-surface">142</div>
+</div>
+<div class="bg-surface-container-lowest border border-border rounded-lg p-4 shadow-sm border-t-2 border-t-success">
+<h3 class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Active</h3>
+<div class="text-headline-md font-headline-md text-on-surface">128</div>
+</div>
+<div class="bg-surface-container-lowest border border-border rounded-lg p-4 shadow-sm border-t-2 border-t-warning">
+<h3 class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Degraded</h3>
+<div class="text-headline-md font-headline-md text-on-surface">11</div>
+</div>
+<div class="bg-surface-container-lowest border border-border rounded-lg p-4 shadow-sm border-t-2 border-t-error">
+<h3 class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Offline</h3>
+<div class="text-headline-md font-headline-md text-on-surface">3</div>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="bg-surface-container-lowest border border-border rounded-lg shadow-sm flex flex-col h-[calc(100vh-320px)]">
+<!-- Search/Toolbar -->
+<div class="p-4 border-b border-border flex justify-between items-center bg-surface-bright rounded-t-lg">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm">search</span>
+<input class="w-full pl-9 pr-4 py-2 border border-border rounded-md text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-primary-container bg-surface-container-lowest text-on-surface" placeholder="Search sources by name, endpoint, or tag..." type="text">
+</div>
+<div class="flex gap-2">
+<button class="p-2 border border-border rounded hover:bg-surface-container-low text-on-surface-variant transition-colors" title="Refresh">
+<span class="material-symbols-outlined text-sm">refresh</span>
+</button>
+<button class="p-2 border border-border rounded hover:bg-surface-container-low text-on-surface-variant transition-colors" title="Export CSV">
+<span class="material-symbols-outlined text-sm">download</span>
+</button>
+</div>
+</div>
+<!-- Table Wrapper (Scrollable) -->
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface border-b border-border z-10 shadow-sm">
+<tr>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant w-10">
+<input class="rounded border-border text-primary focus:ring-primary-container" type="checkbox">
+</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant font-medium">Source Name</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant font-medium">Status</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant font-medium text-right">Priority</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant font-medium">Last Scan</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant font-medium text-right">Acquired Items</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant font-medium text-right">Error Rate</th>
+<th class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant font-medium text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="py-3 px-4">
+<input class="rounded border-border text-primary focus:ring-primary-container" type="checkbox">
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-body-md font-body-md text-on-surface">Global FinData API</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">api.globalfindata.com/v2</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#ecfdf5] text-[#065f46]">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                                        Healthy
+                                    </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="text-mono-data font-mono-data text-on-surface bg-surface-container px-2 py-1 rounded">High</span>
+</td>
+<td class="py-3 px-4 text-body-md font-body-md text-on-surface-variant">2 mins ago</td>
+<td class="py-3 px-4 text-right text-mono-data font-mono-data text-on-surface">1,452,890</td>
+<td class="py-3 px-4 text-right text-mono-data font-mono-data text-success">0.02%</td>
+<td class="py-3 px-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded transition-colors" title="Run Scan">
+<span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded transition-colors" title="Configure">
+<span class="material-symbols-outlined text-sm">tune</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container/30 rounded transition-colors" title="Disable">
+<span class="material-symbols-outlined text-sm">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="py-3 px-4">
+<input class="rounded border-border text-primary focus:ring-primary-container" type="checkbox">
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-body-md font-body-md text-on-surface">EuroStat Public DB</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">ftp://eurostat.eu/public/</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#fffbeb] text-[#b45309]">
+<span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
+                                        Degraded
+                                    </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="text-mono-data font-mono-data text-on-surface bg-surface-container px-2 py-1 rounded">Medium</span>
+</td>
+<td class="py-3 px-4 text-body-md font-body-md text-on-surface-variant">45 mins ago</td>
+<td class="py-3 px-4 text-right text-mono-data font-mono-data text-on-surface">89,204</td>
+<td class="py-3 px-4 text-right text-mono-data font-mono-data text-warning">4.80%</td>
+<td class="py-3 px-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded transition-colors" title="Run Scan">
+<span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded transition-colors" title="Configure">
+<span class="material-symbols-outlined text-sm">tune</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container/30 rounded transition-colors" title="Disable">
+<span class="material-symbols-outlined text-sm">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="bg-error-container/10 hover:bg-error-container/20 transition-colors group cursor-pointer border-l-2 border-l-error">
+<td class="py-3 px-4">
+<input class="rounded border-border text-primary focus:ring-primary-container" type="checkbox">
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-body-md font-body-md text-on-surface">Legacy Corporate Directory</div>
+<div class="text-label-sm font-label-sm text-error">Connection Timeout (504)</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#fef2f2] text-[#991b1b]">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                        Offline
+                                    </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="text-mono-data font-mono-data text-on-surface bg-surface-container px-2 py-1 rounded">Low</span>
+</td>
+<td class="py-3 px-4 text-body-md font-body-md text-on-surface-variant">3 hours ago</td>
+<td class="py-3 px-4 text-right text-mono-data font-mono-data text-on-surface">12,005</td>
+<td class="py-3 px-4 text-right text-mono-data font-mono-data text-error">100.0%</td>
+<td class="py-3 px-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded transition-colors" title="Retry Connection">
+<span class="material-symbols-outlined text-sm">refresh</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded transition-colors" title="Configure">
+<span class="material-symbols-outlined text-sm">tune</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container/30 rounded transition-colors" title="Disable">
+<span class="material-symbols-outlined text-sm">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="py-3 px-4">
+<input class="rounded border-border text-primary focus:ring-primary-container" type="checkbox">
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-body-md font-body-md text-on-surface">APAC Regulatory Feed</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">wss://stream.apacreg.net/v1</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#ecfdf5] text-[#065f46]">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                                        Healthy
+                                    </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="text-mono-data font-mono-data text-on-surface bg-surface-container px-2 py-1 rounded">High</span>
+</td>
+<td class="py-3 px-4 text-body-md font-body-md text-on-surface-variant">Streaming...</td>
+<td class="py-3 px-4 text-right text-mono-data font-mono-data text-on-surface">3,244,198</td>
+<td class="py-3 px-4 text-right text-mono-data font-mono-data text-success">0.00%</td>
+<td class="py-3 px-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded transition-colors" title="Pause Stream">
+<span class="material-symbols-outlined text-sm">pause</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded transition-colors" title="Configure">
+<span class="material-symbols-outlined text-sm">tune</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container/30 rounded transition-colors" title="Disable">
+<span class="material-symbols-outlined text-sm">block</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-3 border-t border-border flex items-center justify-between bg-surface-bright rounded-b-lg">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Showing 1 to 4 of 142 entries</span>
+<div class="flex gap-1">
+<button class="px-2 py-1 text-on-surface-variant border border-border rounded hover:bg-surface-container-low disabled:opacity-50" disabled="">Previous</button>
+<button class="px-3 py-1 bg-primary-container text-on-primary-container rounded font-medium">1</button>
+<button class="px-3 py-1 text-on-surface-variant border border-border rounded hover:bg-surface-container-low">2</button>
+<button class="px-3 py-1 text-on-surface-variant border border-border rounded hover:bg-surface-container-low">3</button>
+<button class="px-2 py-1 text-on-surface-variant border border-border rounded hover:bg-surface-container-low">Next</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

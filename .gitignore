@@ -1,0 +1,35 @@
+# Segreti — non committare mai il file .env reale, solo .env.example
+.env
+.env.*.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.npm-cache/
+backend/.audit-cache/
+
+# Docker / dati locali persistiti fuori dai volumi nominati
+*.log
+backups/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Credenziali di connessione al server — non committare mai
+*.tlp
+scrapefella.octopussy.dev.txt

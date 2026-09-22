@@ -1,0 +1,348 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Lavoro Esterno - Exports</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f2f3ff",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "on-tertiary-container": "#ffede6",
+                        "info": "#0ea5e9",
+                        "on-surface": "#131b2e",
+                        "on-surface-variant": "#434655",
+                        "border": "#e2e8f0",
+                        "on-primary-container": "#eeefff",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "muted": "#f1f5f9",
+                        "on-tertiary-fixed": "#360f00",
+                        "tertiary-fixed": "#ffdbcd",
+                        "primary": "#004ac6",
+                        "surface-bright": "#faf8ff",
+                        "surface-container-highest": "#dae2fd",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-tint": "#0053db",
+                        "primary-container": "#2563eb",
+                        "tertiary-container": "#bc4800",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-background": "#131b2e",
+                        "surface": "#faf8ff",
+                        "on-secondary-container": "#57657a",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b4c5ff",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "outline": "#737686",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#faf8ff",
+                        "tertiary": "#943700",
+                        "surface-variant": "#dae2fd",
+                        "secondary": "#515f74",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d2d9f4",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container": "#eaedff",
+                        "warning": "#f59e0b",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "error": "#ef4444",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "secondary-container": "#d5e3fc",
+                        "surface-container-high": "#e2e7ff",
+                        "success": "#10b981",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-surface": "#283044",
+                        "outline-variant": "#c3c6d7",
+                        "inverse-on-surface": "#eef0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-page": "24px",
+                        "sidebar-collapsed": "64px",
+                        "base": "4px",
+                        "sidebar-width": "260px",
+                        "topbar-height": "56px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "mono-data": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["18px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex fixed left-0 top-0 h-screen w-sidebar-width bg-surface-container-lowest border-r border-border flex-col py-4 z-50">
+<div class="px-gutter mb-6">
+<h1 class="text-headline-sm font-headline-lg text-primary tracking-tight">Lavoro Esterno</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Enterprise Data</p>
+</div>
+<div class="flex flex-col flex-grow px-2 gap-1">
+<a class="flex items-center px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-low transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-low transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">search</span>
+                Search
+            </a>
+<a class="flex items-center px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-low transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">database</span>
+                Records
+            </a>
+<a class="flex items-center px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-low transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">source</span>
+                Sources
+            </a>
+<a class="flex items-center px-4 py-2 rounded bg-secondary-container text-on-secondary-container font-semibold transition-all duration-150 text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined mr-3" data-weight="fill">cloud_download</span>
+                Exports
+            </a>
+<a class="flex items-center px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-low transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+                Admin
+            </a>
+</div>
+<div class="mt-auto flex flex-col px-2 gap-1 border-t border-border pt-4">
+<a class="flex items-center px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-low transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">account_circle</span>
+                Profile
+            </a>
+<a class="flex items-center px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-low transition-colors text-body-md font-body-md text-error" href="#">
+<span class="material-symbols-outlined mr-3 text-error">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex flex-col flex-1 md:ml-sidebar-width h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-40 h-topbar-height bg-surface border-b border-border">
+<div class="flex items-center text-body-md font-body-md">
+<span class="text-on-secondary-container">Breadcrumb</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded-full p-1">
+<span class="material-symbols-outlined">sensors</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded-full p-1">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors text-label-sm font-label-sm px-2">Support</button>
+<button class="bg-primary text-on-primary hover:bg-primary-container transition-colors rounded px-4 py-1.5 text-label-sm font-label-sm font-medium">Account</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 overflow-y-auto p-margin-page bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto space-y-8">
+<!-- Page Header -->
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface mb-1">Export Management</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Configure and monitor data extraction jobs.</p>
+</div>
+<!-- Export Flow Section (Bento/Cards) -->
+<section>
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-4">New Export Job</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Export Type: Text Only -->
+<div class="bg-surface rounded-lg border border-border p-6 hover:shadow-sm transition-shadow cursor-pointer relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary opacity-0 group-hover:opacity-[0.02] transition-opacity"></div>
+<div class="flex items-start justify-between mb-4">
+<div class="p-2 bg-surface-container-low text-primary rounded">
+<span class="material-symbols-outlined">description</span>
+</div>
+<span class="px-2 py-0.5 bg-surface-container-lowest border border-border rounded text-label-sm font-label-sm text-on-surface-variant">Fastest</span>
+</div>
+<h4 class="text-body-lg font-headline-sm font-medium text-on-surface mb-2">Text Only</h4>
+<p class="text-body-md font-body-md text-on-surface-variant mb-4">JSON/CSV payload containing structural data, classifications, and metadata without media files.</p>
+<button class="text-primary text-label-sm font-label-sm font-medium flex items-center group-hover:underline">
+                                Configure <span class="material-symbols-outlined text-[16px] ml-1">arrow_forward</span>
+</button>
+</div>
+<!-- Export Type: Complete with media -->
+<div class="bg-surface rounded-lg border border-primary p-6 shadow-sm relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-16 h-16 bg-primary opacity-[0.03] rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+<div class="flex items-start justify-between mb-4 relative z-10">
+<div class="p-2 bg-primary-container text-on-primary rounded shadow-sm">
+<span class="material-symbols-outlined" data-weight="fill">perm_media</span>
+</div>
+<span class="px-2 py-0.5 bg-primary-container text-on-primary rounded text-label-sm font-label-sm">Standard</span>
+</div>
+<h4 class="text-body-lg font-headline-sm font-medium text-on-surface mb-2 relative z-10">Complete (Media)</h4>
+<p class="text-body-md font-body-md text-on-surface-variant mb-4 relative z-10">Full data payload including all scraped images, videos, and associated media assets.</p>
+<button class="bg-primary text-on-primary hover:bg-primary-container transition-colors rounded px-4 py-1.5 text-label-sm font-label-sm font-medium w-full mt-2 relative z-10">
+                                Start Export
+                            </button>
+</div>
+<!-- Export Type: Complete with non-explicit only -->
+<div class="bg-surface rounded-lg border border-border p-6 hover:shadow-sm transition-shadow cursor-pointer relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary opacity-0 group-hover:opacity-[0.02] transition-opacity"></div>
+<div class="flex items-start justify-between mb-4">
+<div class="p-2 bg-surface-container-low text-secondary rounded">
+<span class="material-symbols-outlined">filter_b_and_w</span>
+</div>
+<span class="px-2 py-0.5 bg-surface-container-lowest border border-border rounded text-label-sm font-label-sm text-on-surface-variant">Filtered</span>
+</div>
+<h4 class="text-body-lg font-headline-sm font-medium text-on-surface mb-2">Safe Complete</h4>
+<p class="text-body-md font-body-md text-on-surface-variant mb-4">Full data payload with automated filtering to exclude explicit or sensitive media content.</p>
+<button class="text-primary text-label-sm font-label-sm font-medium flex items-center group-hover:underline">
+                                Configure <span class="material-symbols-outlined text-[16px] ml-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Exports Jobs Table -->
+<section class="mt-8">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Recent Jobs</h3>
+<div class="flex gap-2">
+<button class="p-1 text-on-surface-variant hover:bg-surface-container-low rounded border border-border">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:bg-surface-container-low rounded border border-border">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+</div>
+</div>
+<div class="bg-surface border border-border rounded-lg overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider border-b border-border">
+<tr>
+<th class="px-4 py-3 font-medium w-32">Export ID</th>
+<th class="px-4 py-3 font-medium">Record Ref</th>
+<th class="px-4 py-3 font-medium">Type</th>
+<th class="px-4 py-3 font-medium">Requested By</th>
+<th class="px-4 py-3 font-medium">Requested At</th>
+<th class="px-4 py-3 font-medium">Status</th>
+<th class="px-4 py-3 font-medium text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="text-body-md font-body-md divide-y divide-border">
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2.5 font-mono-data text-mono-data text-on-surface-variant">EXP-9021</td>
+<td class="px-4 py-2.5 text-on-surface">Target_Alpha_Q3</td>
+<td class="px-4 py-2.5 text-on-surface-variant">Complete (Media)</td>
+<td class="px-4 py-2.5 text-on-surface-variant">system_auto</td>
+<td class="px-4 py-2.5 text-on-surface-variant">2023-10-24 14:30</td>
+<td class="px-4 py-2.5">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-success/10 text-success border border-success/20">
+<span class="w-1.5 h-1.5 rounded-full bg-success mr-1.5"></span>Ready
+                                            </span>
+</td>
+<td class="px-4 py-2.5 text-right">
+<button class="text-primary hover:text-primary-container text-label-sm font-label-sm font-medium flex items-center justify-end w-full">
+<span class="material-symbols-outlined text-[18px] mr-1">download</span> Download
+                                            </button>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2.5 font-mono-data text-mono-data text-on-surface-variant">EXP-9020</td>
+<td class="px-4 py-2.5 text-on-surface">Forum_Scrape_Oct</td>
+<td class="px-4 py-2.5 text-on-surface-variant">Safe Complete</td>
+<td class="px-4 py-2.5 text-on-surface-variant">j.doe@lavoro.net</td>
+<td class="px-4 py-2.5 text-on-surface-variant">2023-10-24 12:15</td>
+<td class="px-4 py-2.5">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-warning/10 text-warning border border-warning/20">
+<span class="material-symbols-outlined text-[12px] mr-1 animate-spin">sync</span>Processing (45%)
+                                            </span>
+</td>
+<td class="px-4 py-2.5 text-right">
+<button class="text-on-surface-variant opacity-50 cursor-not-allowed text-label-sm font-label-sm font-medium flex items-center justify-end w-full">
+<span class="material-symbols-outlined text-[18px] mr-1">download</span> Download
+                                            </button>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2.5 font-mono-data text-mono-data text-on-surface-variant">EXP-9019</td>
+<td class="px-4 py-2.5 text-on-surface">Vendor_List_EU</td>
+<td class="px-4 py-2.5 text-on-surface-variant">Text Only</td>
+<td class="px-4 py-2.5 text-on-surface-variant">a.smith@lavoro.net</td>
+<td class="px-4 py-2.5 text-on-surface-variant">2023-10-23 09:00</td>
+<td class="px-4 py-2.5">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-error/10 text-error border border-error/20">
+<span class="material-symbols-outlined text-[12px] mr-1">error</span>Failed
+                                            </span>
+</td>
+<td class="px-4 py-2.5 text-right">
+<button class="text-on-surface-variant hover:text-on-surface text-label-sm font-label-sm font-medium flex items-center justify-end w-full">
+<span class="material-symbols-outlined text-[18px] mr-1">refresh</span> Retry
+                                            </button>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-4 py-2.5 font-mono-data text-mono-data text-on-surface-variant">EXP-9018</td>
+<td class="px-4 py-2.5 text-on-surface">Target_Beta_Q3</td>
+<td class="px-4 py-2.5 text-on-surface-variant">Complete (Media)</td>
+<td class="px-4 py-2.5 text-on-surface-variant">system_auto</td>
+<td class="px-4 py-2.5 text-on-surface-variant">2023-10-22 18:45</td>
+<td class="px-4 py-2.5">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-success/10 text-success border border-success/20">
+<span class="w-1.5 h-1.5 rounded-full bg-success mr-1.5"></span>Ready
+                                            </span>
+</td>
+<td class="px-4 py-2.5 text-right">
+<button class="text-primary hover:text-primary-container text-label-sm font-label-sm font-medium flex items-center justify-end w-full">
+<span class="material-symbols-outlined text-[18px] mr-1">download</span> Download
+                                            </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-4 py-3 border-t border-border bg-surface-container-lowest flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant">
+<span>Showing 1 to 4 of 42 entries</span>
+<div class="flex gap-1">
+<button class="px-2 py-1 rounded border border-border hover:bg-surface-container-low disabled:opacity-50">Prev</button>
+<button class="px-2 py-1 rounded border border-border bg-surface-container-low text-on-surface">1</button>
+<button class="px-2 py-1 rounded border border-border hover:bg-surface-container-low">2</button>
+<button class="px-2 py-1 rounded border border-border hover:bg-surface-container-low">3</button>
+<button class="px-2 py-1 rounded border border-border hover:bg-surface-container-low">Next</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

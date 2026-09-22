@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Evita run concorrenti sulla stessa ref: annulla il run precedente se ne
+# arriva uno nuovo sullo stesso branch/PR.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------
+  # Backend: lint (ruff) + test (pytest) su FastAPI/Python 3.13.
+  # Usa "uv" per install rapida e riproducibile a partire da uv.lock.
+  # ---------------------------------------------------------------------
+  backend:
+    name: Backend - lint & test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Set up Python 3.13
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        # Installa dal lock versionato includendo il gruppo dev per ruff/pytest.
+        run: uv sync --group dev
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: Run tests
+        env:
+          # Valori fittizi sufficienti per far partire l'app in test:
+          # nessun servizio reale viene contattato (test unitari/integrati
+          # devono usare mock o DB/servizi di test dedicati).
+          DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/test
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET_KEY: ci-test-secret
+          PHONE_ENCRYPTION_KEY: MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=
+          PHONE_HMAC_SECRET: ci-test-hmac-secret
+        run: uv run pytest -v
+
+  # ---------------------------------------------------------------------
+  # Frontend: lint (eslint) + build (Vite/TS) su React/TypeScript.
+  # ---------------------------------------------------------------------
+  frontend:
+    name: Frontend - lint & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: http://localhost/api/v1
+
+  # ---------------------------------------------------------------------
+  # Build delle immagini Docker di tutti i servizi custom (senza push),
+  # per verificare che i Dockerfile restino validi. Gira solo dopo che
+  # lint/test di entrambi i lati sono passati.
+  # ---------------------------------------------------------------------
+  docker-build:
+    name: Docker images build (no push)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: false
+          tags: lavoro-esterno/backend:ci
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: false
+          tags: lavoro-esterno/frontend:ci
+          # frontend Dockerfile legge VITE_API_URL come build arg (vedi
+          # docker-compose.yml); il default del Dockerfile è sufficiente
+          # per verificare solo che il build vada a buon fine in CI.
+
+      # Il servizio "nginx" del docker-compose usa l'immagine ufficiale
+      # nginx:1.27-alpine con infra/nginx/nginx.conf montato a runtime
+      # (nessun Dockerfile dedicato): non c'è quindi un'immagine custom da
+      # buildare qui.

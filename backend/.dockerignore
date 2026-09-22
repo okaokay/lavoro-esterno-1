@@ -1,0 +1,10 @@
+.venv
+.uv-cache
+.uv-python
+.audit-cache
+.pytest_cache
+.ruff_cache
+**/__pycache__
+**/*.pyc
+.git
+

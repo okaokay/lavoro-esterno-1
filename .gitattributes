@@ -1,0 +1,4 @@
+# Shell scripts are mounted directly into Alpine containers and must never
+# acquire Windows CRLF terminators (`set -eu\r` is parsed as an invalid flag).
+*.sh text eol=lf
+

@@ -1,0 +1,105 @@
+name: Security
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  static-and-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Python security checks
+        working-directory: backend
+        run: |
+          uv sync --group dev
+          uv run bandit -r app -ll -ii
+          uv run pip-audit
+      - name: Frontend dependency audit
+        working-directory: frontend
+        run: |
+          npm ci
+          npm audit --audit-level=high
+      - name: Trivy repository, secret and configuration scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  container-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build images
+        run: |
+          docker build -t lavoro-esterno/backend:security backend
+          docker build -t lavoro-esterno/frontend:security frontend
+      - name: Scan backend image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: lavoro-esterno/backend:security
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: Scan frontend image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: lavoro-esterno/frontend:security
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  zap-external-surface:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_PROJECT_NAME: securityscan
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start disposable stack
+        run: |
+          cp .env.example .env
+          docker compose up -d --build postgres redis minio api frontend nginx
+          for i in {1..60}; do curl -fsS http://localhost/api/v1/healthz && break; sleep 5; done
+          curl -fsS http://localhost/api/v1/healthz
+          mkdir -p security-reports
+      - name: ZAP passive baseline
+        run: |
+          docker run --rm --network securityscan_lavoro-esterno-net -v "$PWD/security-reports:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://nginx -I -J baseline.json -r baseline.html
+      - name: ZAP OpenAPI scan
+        run: |
+          docker run --rm --network securityscan_lavoro-esterno-net -v "$PWD/security-reports:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable zap-api-scan.py -t http://nginx/openapi.json -f openapi -I -J api.json -r api.html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-security-reports
+          path: security-reports/
+      - if: always()
+        run: docker compose down -v

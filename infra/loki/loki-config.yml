@@ -1,0 +1,54 @@
+# =============================================================================
+# Loki - configurazione minimale single-binary (target "all")
+# -----------------------------------------------------------------------------
+# Adatta per ambiente di sviluppo/piccola produzione: storage filesystem
+# locale (nessun backend object storage esterno). Per produzione a scala
+# maggiore valutare migrazione a storage S3-compatible (es. lo stesso
+# MinIO già presente nello stack) e deployment in modalità microservizi.
+# =============================================================================
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+
+common:
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+ruler:
+  alertmanager_url: http://localhost:9093
+
+# Retention log tecnici: 90 giorni (2160 ore), allineata al default
+# TECHNICAL_LOG_RETENTION_DAYS e alla policy in docs/SICUREZZA.md.
+limits_config:
+  retention_period: 2160h
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+
+compactor:
+  working_directory: /loki/compactor
+  retention_enabled: true
+  # Richiesto dalle versioni recenti di Loki quando retention_enabled=true:
+  # deve puntare a un object store valido per salvare le "delete request"
+  # generate dal retention job. Usiamo lo stesso filesystem locale già
+  # configurato sopra (nessun backend esterno in questo scaffold).
+  delete_request_store: filesystem

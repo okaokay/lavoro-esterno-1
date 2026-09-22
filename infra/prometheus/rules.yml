@@ -1,0 +1,15 @@
+# Recording rule condivise dalle dashboard per ridurre query ripetute e costose.
+groups:
+  - name: lavoro-esterno-recording
+    interval: 30s
+    rules:
+      - record: lavoro_esterno:api_requests_per_minute
+        expr: sum(rate(lavoro_esterno_http_requests_total[5m])) * 60
+      - record: lavoro_esterno:api_server_error_ratio
+        expr: sum(rate(lavoro_esterno_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(lavoro_esterno_http_requests_total[5m])), 0.000001)
+      - record: lavoro_esterno:api_latency_p95_seconds
+        expr: histogram_quantile(0.95, sum by (le) (rate(lavoro_esterno_http_request_duration_highr_seconds_bucket[5m])))
+      - record: lavoro_esterno:celery_queue_length
+        expr: sum by (queue_name) (celery_queue_length)
+      - record: lavoro_esterno:volume_free_ratio
+        expr: node_filesystem_avail_bytes{job="volume-exporter",mountpoint=~"/volumes/(postgres|minio)"} / node_filesystem_size_bytes{job="volume-exporter",mountpoint=~"/volumes/(postgres|minio)"}

@@ -1,0 +1,550 @@
+networks:
+  lavoro-esterno-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  minio-data:
+  grafana-data:
+  prometheus-data:
+  loki-data:
+  alloy-data:
+  # Backup locali (stesso host Docker): non sostituiscono un backup
+  # off-site, vedi infra/backup/ e docs/DATABASE.md § Backup.
+  postgres-backups:
+  minio-backups:
+  ollama-data:
+
+services:
+  # Inferenza LLM locale. La porta resta solo sulla rete Docker.
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    expose:
+      - "11434"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    networks:
+      - lavoro-esterno-net
+
+  # Scarica Gemma una sola volta; ai riavvii il volume evita un nuovo download.
+  ollama-init:
+    image: ollama/ollama:latest
+    restart: "no"
+    entrypoint: ["/bin/sh", "/scripts/init.sh"]
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_DEFAULT_MODEL: ${OLLAMA_DEFAULT_MODEL:-gemma4:e2b}
+    volumes:
+      - ./infra/ollama:/scripts:ro
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Database - PostgreSQL 17. Resta esclusivamente sulla rete interna,
+  # nessuna porta pubblicata verso l'host in produzione (usare "expose"
+  # per debug locale se necessario, es. "5432:5432" solo in dev).
+  # ---------------------------------------------------------------------
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Broker/cache Redis - usato da Celery (broker + result backend) e come
+  # cache applicativa lato API.
+  # ---------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Storage media S3-compatible. Console (9001) va esposta solo in dev o
+  # dietro autenticazione/VPN in produzione: valutare rimozione della
+  # pubblicazione della porta 9001 in ambienti esposti pubblicamente.
+  # ---------------------------------------------------------------------
+  minio:
+    image: quay.io/minio/minio:latest
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_SITE_REGION: ${MINIO_REGION:-us-east-1}
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Backup Postgres: dump giornaliero + rotazione, su un volume locale
+  # separato dal volume dati (postgres-backups, non postgres-data).
+  # Locale/Docker Compose per ora (vedi docs/DATABASE.md § Backup): quando
+  # si sceglie l'hosting definitivo, adattare backup-postgres.sh per
+  # spedire i dump anche a uno storage remoto/off-site.
+  # ---------------------------------------------------------------------
+  backup-postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/scripts/backup-postgres.sh"]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+    volumes:
+      - ./infra/backup:/scripts:ro
+      - postgres-backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Backup MinIO: mirror giornaliero del bucket media + rotazione, su un
+  # volume locale separato (minio-backups). Stessa nota sopra: locale per
+  # ora, da adattare a un target S3-compatible remoto in produzione.
+  # ---------------------------------------------------------------------
+  backup-minio:
+    image: quay.io/minio/mc:latest
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/scripts/backup-minio.sh"]
+    environment:
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: ${MINIO_BUCKET:-lavoro-esterno-media}
+      MINIO_SECURE: ${MINIO_SECURE:-false}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+    volumes:
+      - ./infra/backup:/scripts:ro
+      - minio-backups:/backups
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Migrazioni DB - barriera one-shot condivisa da API, scheduler e worker.
+  # Un processo applicativo non parte finché Alembic non ha portato lo
+  # schema alla head inclusa nella stessa immagine backend.
+  # ---------------------------------------------------------------------
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: "no"
+    command: ["alembic", "upgrade", "head"]
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # API - FastAPI. Nessuna porta pubblicata verso l'host: raggiungibile
+  # solo tramite il reverse proxy nginx (vedi infra/nginx/nginx.conf).
+  # "expose" documenta la porta interna senza pubblicarla sull'host.
+  # ---------------------------------------------------------------------
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    env_file:
+      - .env
+    expose:
+      - "8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Worker Celery dedicato alla coda "scraping" (esecuzione connettori
+  # scraper per fonte, orchestrati dallo scheduler o avviati manualmente).
+  # Ascolta anche "maintenance" (pulizia retention notturna, vedi
+  # app/workers/tasks_maintenance.py): è un task leggero e poco frequente,
+  # non giustifica un servizio Celery dedicato.
+  # ---------------------------------------------------------------------
+  worker-scraper:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "-Q", "scraping,maintenance", "-n", "worker-scraper@%h", "--loglevel=info"]
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Worker Celery dedicato alla coda "media" (download, classificazione,
+  # generazione anteprime/thumbnail dei media associati agli annunci).
+  # ---------------------------------------------------------------------
+  worker-media:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "-Q", "media", "-n", "worker-media@%h", "--loglevel=info"]
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Worker Celery dedicato alla coda "ai" (classificazione contenuti,
+  # generazione riepiloghi tramite LLM/ONNX).
+  # ---------------------------------------------------------------------
+  worker-ai:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "-Q", "ai", "-n", "worker-ai@%h", "--loglevel=info", "--concurrency=1"]
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
+    networks:
+      - lavoro-esterno-net
+
+  # Export ZIP are isolated from CPU-heavy media and external AI workloads.
+  worker-exports:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "-Q", "exports", "-n", "worker-exports@%h", "--loglevel=info", "--concurrency=1"]
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # Consegne webhook isolate: retry e destinazioni lente non bloccano scraping o export.
+  worker-webhooks:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "-Q", "webhooks", "-n", "worker-webhooks@%h", "--loglevel=info", "--concurrency=2"]
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Scheduler (Celery Beat) - pianifica i run periodici degli scraper e
+  # altri task ricorrenti (es. pulizia export scaduti).
+  # ---------------------------------------------------------------------
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["celery", "-A", "app.workers.celery_app", "beat", "--loglevel=info"]
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Frontend - build statica React/Vite servita da nginx interno al
+  # container applicativo (immagine multi-stage in frontend/Dockerfile).
+  # Non pubblica porte verso l'host: passa dal reverse proxy principale.
+  # ---------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # VITE_API_URL viene "baked" nel bundle statico in fase di build (Vite
+      # espone solo le env lette a build-time), quindi va passato qui come
+      # build arg invece che come env_file a runtime del container.
+      # Deve puntare al reverse proxy pubblico (nginx), non alla porta
+      # interna 8000 dell'api, che non è raggiungibile dal browser.
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api/v1}
+    restart: unless-stopped
+    expose:
+      - "8080"
+    depends_on:
+      - api
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Reverse proxy - unico punto di ingresso pubblico dello stack.
+  # Espone 80/443 e instrada "/" verso il frontend e "/api/" verso l'API.
+  # ---------------------------------------------------------------------
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      # Loopback IPv4 esplicito: evita che Docker Desktop/WSL intercetti
+      # localhost su ::1 con un relay IPv6 non responsivo.
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:443:443"
+    depends_on:
+      - frontend
+      - api
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Observability - Prometheus raccoglie le metriche esposte dall'API su
+  # /metrics (vedi infra/prometheus/prometheus.yml).
+  # ---------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v3.14.0
+    restart: unless-stopped
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infra/prometheus/rules.yml:/etc/prometheus/rules.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Observability - Grafana, con datasource Prometheus/Loki provisionati
+  # automaticamente all'avvio (infra/grafana/provisioning).
+  # ---------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:13.2.1
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - loki
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:3000/api/health >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks:
+      - lavoro-esterno-net
+
+  # ---------------------------------------------------------------------
+  # Observability - Loki, log aggregation single-binary. Grafana Alloy
+  # raccoglie stdout/stderr Docker e li inoltra a questa istanza.
+  # ---------------------------------------------------------------------
+  loki:
+    image: grafana/loki:3.7.7
+    restart: unless-stopped
+    command: ["-config.file=/etc/loki/loki-config.yml"]
+    volumes:
+      - ./infra/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki-data:/loki
+    ports:
+      - "3100:3100"
+    networks:
+      - lavoro-esterno-net
+
+  # Raccoglie gli eventi Celery dal broker senza esporre porte sull'host.
+  celery-exporter:
+    build:
+      context: .
+      dockerfile: infra/celery-exporter/Dockerfile
+    image: lavoro-esterno/celery-exporter:0.12.2-d45a395e
+    restart: unless-stopped
+    command:
+      - --broker-url=${REDIS_URL:-redis://redis:6379/0}
+      - --retry-interval=5
+      - --queues=scraping,maintenance,media,ai,exports,webhooks
+      - --generic-hostname-task-sent-metric
+    expose:
+      - "9808"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # Metriche PostgreSQL (connessioni, transazioni, dimensioni e stato).
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.20.1
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_URI: postgres:5432/${POSTGRES_DB}?sslmode=disable
+      DATA_SOURCE_USER: ${POSTGRES_USER}
+      DATA_SOURCE_PASS: ${POSTGRES_PASSWORD}
+      PG_EXPORTER_COLLECTION_TIMEOUT: 10s
+    expose:
+      - "9187"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # Metriche del broker/cache Redis; nessuna porta viene pubblicata.
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.90.0
+    restart: unless-stopped
+    environment:
+      REDIS_ADDR: ${REDIS_URL:-redis://redis:6379/0}
+    expose:
+      - "9121"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - lavoro-esterno-net
+
+  # Il filesystem collector misura lo spazio dei due volumi dati montati
+  # read-only. Non accede al contenuto e non puo modificarlo.
+  volume-exporter:
+    image: prom/node-exporter:v1.12.1
+    restart: unless-stopped
+    command:
+      - --collector.disable-defaults
+      - --collector.filesystem
+      - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|etc)($$|/)
+    volumes:
+      - postgres-data:/volumes/postgres:ro
+      - minio-data:/volumes/minio:ro
+    expose:
+      - "9100"
+    networks:
+      - lavoro-esterno-net
+
+  # Alloy sostituisce Promtail e inoltra a Loki i log stdout/stderr dei soli
+  # container appartenenti a questo progetto Compose.
+  alloy:
+    image: grafana/alloy:v1.19.2
+    restart: unless-stopped
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy
+      - /etc/alloy/config.alloy
+    environment:
+      ALLOY_COMPOSE_PROJECT: ${OBSERVABILITY_COMPOSE_PROJECT:-lavoro-esterno-1}
+    volumes:
+      - ./infra/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - alloy-data:/var/lib/alloy
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    expose:
+      - "12345"
+    depends_on:
+      - loki
+    networks:
+      - lavoro-esterno-net

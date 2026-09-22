@@ -1,0 +1,75 @@
+{
+  "annotations": {"list": []}, "editable": false, "graphTooltip": 1, "id": null,
+  "links": [
+    {"title": "API Health", "type": "link", "url": "/d/lavoro-esterno-api/api-health"},
+    {"title": "Scraping Sources", "type": "link", "url": "/d/lavoro-esterno-scraping/scraping-sources"}
+  ],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}, "id": 1,
+      "fieldConfig": {"defaults": {"thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "textMode": "auto"},
+      "targets": [{"expr": "sum(celery_worker_up)", "instant": true, "refId": "A"}], "title": "Workers online", "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}, "id": 2,
+      "fieldConfig": {"defaults": {"thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "orange", "value": 25}, {"color": "red", "value": 100}]}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "textMode": "auto"},
+      "targets": [{"expr": "sum(celery_queue_length)", "instant": true, "refId": "A"}], "title": "Queued tasks", "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}, "id": 3,
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "textMode": "auto"},
+      "targets": [{"expr": "sum(rate(celery_task_succeeded_total[5m]))", "instant": true, "refId": "A"}], "title": "Success throughput", "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}, "id": 4,
+      "fieldConfig": {"defaults": {"thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "red", "value": 1}]}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "textMode": "auto"},
+      "targets": [{"expr": "sum(increase(celery_task_failed_total[1h]))", "instant": true, "refId": "A"}], "title": "Failures (1h)", "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}, "id": 5,
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [{"expr": "sum by (queue_name) (celery_queue_length)", "legendFormat": "{{queue_name}}", "refId": "A"}], "title": "Queue length", "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}, "id": 6,
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "sum by (queue_name) (rate(celery_task_succeeded_total[$__rate_interval]))", "legendFormat": "success {{queue_name}}", "refId": "A"},
+        {"expr": "sum by (queue_name) (rate(celery_task_failed_total[$__rate_interval]))", "legendFormat": "failed {{queue_name}}", "refId": "B"},
+        {"expr": "sum by (queue_name) (rate(celery_task_retried_total[$__rate_interval]))", "legendFormat": "retry {{queue_name}}", "refId": "C"}
+      ], "title": "Task outcomes", "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}, "id": 7,
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [{"expr": "histogram_quantile(0.95, sum by (queue_name, le) (rate(celery_task_runtime_bucket[$__rate_interval])))", "legendFormat": "{{queue_name}}", "refId": "A"}], "title": "Task runtime p95", "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}, "id": 8,
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [{"expr": "histogram_quantile(0.95, sum by (queue_name, le) (rate(celery_task_queue_wait_time_bucket[$__rate_interval])))", "legendFormat": "{{queue_name}}", "refId": "A"}], "title": "Queue wait p95", "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 6, "w": 8, "x": 0, "y": 20}, "id": 9,
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "options": {"showHeader": true},
+      "targets": [{"expr": "sum by (queue_name) (celery_queue_length) > 0 unless on(queue_name) sum by (queue_name) (increase(celery_task_started_total[15m])) > 0", "format": "table", "instant": true, "refId": "A"}], "title": "Queues without progress (15m)", "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"}, "gridPos": {"h": 6, "w": 16, "x": 8, "y": 20}, "id": 10,
+      "options": {"dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": false, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "targets": [{"expr": "{service=~\"worker-.+|scheduler\"}", "refId": "A"}], "title": "Worker logs", "type": "logs"
+    }
+  ],
+  "refresh": "30s", "schemaVersion": 42, "tags": ["lavoro-esterno", "celery"],
+  "templating": {"list": []}, "time": {"from": "now-6h", "to": "now"}, "timezone": "browser",
+  "title": "Celery Workers", "uid": "lavoro-esterno-celery", "version": 1
+}

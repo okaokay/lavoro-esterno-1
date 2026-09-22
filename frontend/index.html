@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lavoro Esterno</title>
+    <!-- Applies the persisted theme (or the OS preference, if never set)
+         BEFORE the stylesheet/React even load, so there's no flash of the
+         wrong theme on first paint. Kept in sync with the storage key and
+         resolution logic in src/context/ThemeContext.tsx — if that key
+         changes, update it here too. -->
+    <script>
+      (function () {
+        var stored = localStorage.getItem("lavoro_esterno_theme");
+        var isDark =
+          stored === "dark" ||
+          (stored !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.classList.toggle("dark", isDark);
+      })();
+    </script>
+    <!-- Inter (UI text) + JetBrains Mono (phone numbers / IDs / technical data) + Material Symbols (icon font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-background text-on-background antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

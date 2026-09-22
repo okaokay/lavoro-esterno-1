@@ -1,0 +1,21 @@
+# =============================================================================
+# Grafana - provider di dashboard automatico
+# -----------------------------------------------------------------------------
+# Carica automaticamente all'avvio ogni file .json presente in questa
+# stessa cartella (infra/grafana/provisioning/dashboards). Al momento non
+# sono presenti dashboard: vedi PROGETTO.md, sezione Observability, per il
+# lavoro da fare (dashboard API, worker Celery, scraper per fonte).
+# =============================================================================
+
+apiVersion: 1
+
+providers:
+  - name: "lavoro-esterno-dashboards"
+    orgId: 1
+    folder: "Lavoro Esterno"
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

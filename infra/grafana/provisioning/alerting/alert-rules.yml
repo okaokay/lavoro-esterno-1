@@ -1,0 +1,304 @@
+# Regole Grafana provisionate senza contact point esterni: gli alert restano nella UI.
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: Core availability
+    folder: Lavoro Esterno
+    interval: 1m
+    rules:
+      - uid: lavoro-esterno-api-down
+        title: API down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              editorMode: code
+              expr: 'up{job="api"}'
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [1], type: lt}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {params: [], type: last}
+                  type: query
+              datasource: {type: __expr__, uid: __expr__}
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 2m
+        annotations:
+          summary: API non raggiungibile da Prometheus da almeno 2 minuti
+          dashboardUid: lavoro-esterno-api
+        labels: {severity: critical, component: api}
+        isPaused: false
+
+      - uid: lavoro-esterno-exporter-down
+        title: Observability target down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              editorMode: code
+              expr: 'min by (job) (up{job=~"celery-exporter|postgres-exporter|redis-exporter|volume-exporter|loki|alloy"})'
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [1], type: lt}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {params: [], type: last}
+                  type: query
+              datasource: {type: __expr__, uid: __expr__}
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 5m
+        annotations: {summary: "Target di osservabilita non disponibile: {{ $labels.job }}"}
+        labels: {severity: warning, component: observability}
+        isPaused: false
+
+  - orgId: 1
+    name: Celery queues
+    folder: Lavoro Esterno
+    interval: 1m
+    rules:
+      - uid: lavoro-esterno-celery-queue-long
+        title: Celery queue too long
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 900, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              editorMode: code
+              expr: 'sum by (queue_name) (celery_queue_length)'
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [100], type: gt}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {params: [], type: last}
+                  type: query
+              datasource: {type: __expr__, uid: __expr__}
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: "La coda {{ $labels.queue_name }} supera 100 task da almeno 10 minuti"
+          dashboardUid: lavoro-esterno-celery
+        labels: {severity: critical, component: celery}
+        isPaused: false
+
+      - uid: lavoro-esterno-celery-queue-stuck
+        title: Celery queue without progress
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 1200, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              editorMode: code
+              expr: 'sum by (queue_name) (celery_queue_length) > 0 unless on(queue_name) sum by (queue_name) (increase(celery_task_started_total[15m])) > 0'
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [0], type: gt}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {params: [], type: last}
+                  type: query
+              datasource: {type: __expr__, uid: __expr__}
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 15m
+        annotations:
+          summary: "La coda {{ $labels.queue_name }} contiene task ma non avanza da almeno 15 minuti"
+          dashboardUid: lavoro-esterno-celery
+        labels: {severity: critical, component: celery}
+        isPaused: false
+
+  - orgId: 1
+    name: Scraping sources
+    folder: Lavoro Esterno
+    interval: 1m
+    rules:
+      - uid: lavoro-esterno-source-failures
+        title: Repeated scraping failures
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              editorMode: code
+              expr: lavoro_esterno_scrape_consecutive_failures
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [2], type: gt}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {params: [], type: last}
+                  type: query
+              datasource: {type: __expr__, uid: __expr__}
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: "La fonte {{ $labels.source }} ha fallito almeno 3 run consecutivi"
+          dashboardUid: lavoro-esterno-scraping
+        labels: {severity: critical, component: scraping}
+        isPaused: false
+
+      - uid: lavoro-esterno-scrape-collector-down
+        title: Scraping metrics collector down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              editorMode: code
+              expr: lavoro_esterno_scrape_metrics_collector_up
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [1], type: lt}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {params: [], type: last}
+                  type: query
+              datasource: {type: __expr__, uid: __expr__}
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 5m
+        annotations: {summary: Il collector DB delle metriche scraping non riesce ad aggiornarsi}
+        labels: {severity: warning, component: scraping}
+        isPaused: false
+
+  - orgId: 1
+    name: Storage capacity
+    folder: Lavoro Esterno
+    interval: 1m
+    rules:
+      - uid: lavoro-esterno-volume-low-space
+        title: Data volume low on space
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: {from: 1200, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              editorMode: code
+              expr: '100 * lavoro_esterno:volume_free_ratio'
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: C
+            relativeTimeRange: {from: 0, to: 0}
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: {params: [15], type: lt}
+                  operator: {type: and}
+                  query: {params: [C]}
+                  reducer: {params: [], type: last}
+                  type: query
+              datasource: {type: __expr__, uid: __expr__}
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 15m
+        annotations: {summary: "Il volume {{ $labels.mountpoint }} ha meno del 15% di spazio libero"}
+        labels: {severity: critical, component: storage}
+        isPaused: false

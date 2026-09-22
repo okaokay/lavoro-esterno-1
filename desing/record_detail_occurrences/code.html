@@ -1,0 +1,373 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Occurrences - Lavoro Esterno</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f2f3ff",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "on-tertiary-container": "#ffede6",
+                        "info": "#0ea5e9",
+                        "on-surface": "#131b2e",
+                        "on-surface-variant": "#434655",
+                        "border": "#e2e8f0",
+                        "on-primary-container": "#eeefff",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "muted": "#f1f5f9",
+                        "on-tertiary-fixed": "#360f00",
+                        "tertiary-fixed": "#ffdbcd",
+                        "primary": "#004ac6",
+                        "surface-bright": "#faf8ff",
+                        "surface-container-highest": "#dae2fd",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-tint": "#0053db",
+                        "primary-container": "#2563eb",
+                        "tertiary-container": "#bc4800",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-background": "#131b2e",
+                        "surface": "#faf8ff",
+                        "on-secondary-container": "#57657a",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b4c5ff",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "outline": "#737686",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#faf8ff",
+                        "tertiary": "#943700",
+                        "surface-variant": "#dae2fd",
+                        "secondary": "#515f74",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d2d9f4",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container": "#eaedff",
+                        "warning": "#f59e0b",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "error": "#ef4444",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "secondary-container": "#d5e3fc",
+                        "surface-container-high": "#e2e7ff",
+                        "success": "#10b981",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-surface": "#283044",
+                        "outline-variant": "#c3c6d7",
+                        "inverse-on-surface": "#eef0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-page": "24px",
+                        "sidebar-collapsed": "64px",
+                        "base": "4px",
+                        "sidebar-width": "260px",
+                        "topbar-height": "56px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "mono-data": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "mono-data": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["18px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex text-body-md">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-sidebar-width bg-surface-container-lowest border-r border-border flex flex-col py-4 z-50">
+<div class="px-gutter mb-6">
+<h1 class="text-headline-sm font-headline-lg text-primary tracking-tight">Lavoro Esterno</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Enterprise Data</p>
+</div>
+<div class="flex-1 px-2 space-y-1">
+<a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+<span class="text-label-sm font-label-sm">Dashboard</span>
+</a>
+<a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">search</span>
+<span class="text-label-sm font-label-sm">Search</span>
+</a>
+<a class="flex items-center px-3 py-2 rounded-lg bg-secondary-container text-on-secondary-container font-semibold" href="#">
+<span class="material-symbols-outlined mr-3" style="font-variation-settings: 'FILL' 1;">database</span>
+<span class="text-label-sm font-label-sm">Records</span>
+</a>
+<a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">source</span>
+<span class="text-label-sm font-label-sm">Sources</span>
+</a>
+<a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">cloud_download</span>
+<span class="text-label-sm font-label-sm">Exports</span>
+</a>
+<a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+<span class="text-label-sm font-label-sm">Admin</span>
+</a>
+</div>
+<div class="px-2 mt-auto space-y-1">
+<a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">account_circle</span>
+<span class="text-label-sm font-label-sm">Profile</span>
+</a>
+<a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">logout</span>
+<span class="text-label-sm font-label-sm">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-sidebar-width flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-40 bg-surface h-topbar-height border-b border-border">
+<div class="flex items-center space-x-2">
+<a class="text-on-secondary-container hover:text-primary transition-colors text-label-sm font-label-sm" href="#">Records</a>
+<span class="material-symbols-outlined text-outline text-[16px]">chevron_right</span>
+<span class="text-on-surface font-semibold text-label-sm font-label-sm">REC-8492-AX</span>
+</div>
+<div class="flex items-center space-x-4">
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">sensors</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<div class="h-4 w-px bg-border mx-2"></div>
+<button class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors">Support</button>
+<button class="text-label-sm font-label-sm text-primary font-semibold hover:text-primary-container transition-colors">Account</button>
+</div>
+</header>
+<!-- Record Header & Tabs -->
+<div class="px-margin-page pt-margin-page pb-0 bg-surface-container-lowest border-b border-border">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface mb-1">Global Trade Network Data Leak</h2>
+<div class="flex items-center space-x-3 text-label-sm font-label-sm text-on-surface-variant">
+<span class="bg-surface-container px-2 py-0.5 rounded text-mono-data font-mono-data">REC-8492-AX</span>
+<span class="flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">schedule</span> Last updated 2h ago</span>
+</div>
+</div>
+<div class="flex space-x-2">
+<button class="px-3 py-1.5 border border-border rounded-lg text-label-sm font-label-sm text-on-surface hover:bg-surface-container-low transition-colors">Export CSV</button>
+<button class="px-3 py-1.5 bg-primary text-on-primary rounded-lg text-label-sm font-label-sm hover:bg-primary-container transition-colors">Add Note</button>
+</div>
+</div>
+<div class="flex space-x-6">
+<a class="pb-3 text-label-sm font-label-sm text-on-secondary-container hover:text-primary transition-colors" href="#">Overview</a>
+<a class="pb-3 text-label-sm font-label-sm text-primary font-bold border-b-2 border-primary" href="#">Occurrences</a>
+<a class="pb-3 text-label-sm font-label-sm text-on-secondary-container hover:text-primary transition-colors" href="#">Entities</a>
+<a class="pb-3 text-label-sm font-label-sm text-on-secondary-container hover:text-primary transition-colors" href="#">History</a>
+</div>
+</div>
+<!-- Occurrences Content -->
+<div class="flex-1 p-margin-page bg-background">
+<div class="bg-surface-container-lowest border border-border rounded-lg shadow-sm flex flex-col">
+<!-- Table Header Actions -->
+<div class="p-4 border-b border-border flex justify-between items-center bg-surface-container-lowest rounded-t-lg">
+<div class="flex items-center space-x-2">
+<span class="text-label-sm font-label-sm text-on-surface font-semibold">14 Occurrences Found</span>
+</div>
+<div class="flex items-center space-x-2">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[16px]">search</span>
+<input class="pl-8 pr-3 py-1.5 border border-border rounded-lg text-label-sm font-label-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-64" placeholder="Filter sources..." type="text">
+</div>
+<button class="p-1.5 border border-border rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-border bg-surface text-on-surface-variant">
+<th class="py-2 px-4 text-label-sm font-label-sm font-semibold w-10"></th>
+<th class="py-2 px-4 text-label-sm font-label-sm font-semibold">Source</th>
+<th class="py-2 px-4 text-label-sm font-label-sm font-semibold">Title</th>
+<th class="py-2 px-4 text-label-sm font-label-sm font-semibold">Source URL</th>
+<th class="py-2 px-4 text-label-sm font-label-sm font-semibold">First / Last Seen</th>
+<th class="py-2 px-4 text-label-sm font-label-sm font-semibold">Scraped At</th>
+<th class="py-2 px-4 text-label-sm font-label-sm font-semibold">Confidence</th>
+<th class="py-2 px-4 text-label-sm font-label-sm font-semibold">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border">
+<!-- Row 1 (Canonical) -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group bg-blue-50/30">
+<td class="py-3 px-4">
+<button class="text-outline group-hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[14px]">forum</span>
+</div>
+<span class="text-body-md font-body-md text-on-surface font-medium">BreachForums</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-2">
+<span class="text-body-md font-body-md text-on-surface truncate max-w-[200px]">GTN Database Dump 2024</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-primary-container text-on-primary-container border border-primary/20">Canonical</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="text-mono-data font-mono-data text-on-surface-variant truncate max-w-[150px] inline-block">bf.top/threads/gtn-db-dump...</span>
+</td>
+<td class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant">
+<div>2024-05-12</div>
+<div class="text-outline">2024-05-18</div>
+</td>
+<td class="py-3 px-4 text-mono-data font-mono-data text-on-surface-variant">
+                                    2024-05-18 14:32:01
+                                </td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-16 h-1.5 bg-border rounded-full overflow-hidden">
+<div class="w-[95%] h-full bg-success"></div>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface">95%</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-success/10 text-success border border-success/20">
+                                        Active
+                                    </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-3 px-4">
+<button class="text-outline group-hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[14px]">public</span>
+</div>
+<span class="text-body-md font-body-md text-on-surface font-medium">Pastebin</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-2">
+<span class="text-body-md font-body-md text-on-surface truncate max-w-[200px]">GTN Sample Data Preview</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="text-mono-data font-mono-data text-on-surface-variant truncate max-w-[150px] inline-block">pastebin.com/raw/xY7a9Qp</span>
+</td>
+<td class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant">
+<div>2024-05-13</div>
+<div class="text-outline">2024-05-15</div>
+</td>
+<td class="py-3 px-4 text-mono-data font-mono-data text-on-surface-variant">
+                                    2024-05-16 09:15:44
+                                </td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-16 h-1.5 bg-border rounded-full overflow-hidden">
+<div class="w-[82%] h-full bg-info"></div>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface">82%</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-outline/10 text-on-surface-variant border border-outline/20">
+                                        Offline
+                                    </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-3 px-4">
+<button class="text-outline group-hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[14px]">send</span>
+</div>
+<span class="text-body-md font-body-md text-on-surface font-medium">Telegram (Channel)</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-2">
+<span class="text-body-md font-body-md text-on-surface truncate max-w-[200px]">DataMarket Updates</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="text-mono-data font-mono-data text-on-surface-variant truncate max-w-[150px] inline-block">t.me/datamarket/8921</span>
+</td>
+<td class="py-3 px-4 text-label-sm font-label-sm text-on-surface-variant">
+<div>2024-05-14</div>
+<div class="text-outline">2024-05-18</div>
+</td>
+<td class="py-3 px-4 text-mono-data font-mono-data text-on-surface-variant">
+                                    2024-05-18 10:05:12
+                                </td>
+<td class="py-3 px-4">
+<div class="flex items-center space-x-2">
+<div class="w-16 h-1.5 bg-border rounded-full overflow-hidden">
+<div class="w-[65%] h-full bg-warning"></div>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface">65%</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-success/10 text-success border border-success/20">
+                                        Active
+                                    </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-3 border-t border-border bg-surface-container-lowest rounded-b-lg flex justify-between items-center">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Showing 1-3 of 14</span>
+<div class="flex space-x-1">
+<button class="px-2 py-1 border border-border rounded text-on-surface-variant disabled:opacity-50" disabled="">Prev</button>
+<button class="px-2 py-1 border border-border rounded text-on-surface hover:bg-surface-container-low">Next</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

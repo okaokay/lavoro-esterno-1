@@ -1,0 +1,473 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Lavoro Esterno - Record History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f2f3ff",
+                      "on-secondary-fixed": "#0d1c2e",
+                      "on-tertiary-container": "#ffede6",
+                      "info": "#0ea5e9",
+                      "on-surface": "#131b2e",
+                      "on-surface-variant": "#434655",
+                      "border": "#e2e8f0",
+                      "on-primary-container": "#eeefff",
+                      "tertiary-fixed-dim": "#ffb596",
+                      "on-secondary-fixed-variant": "#3a485b",
+                      "muted": "#f1f5f9",
+                      "on-tertiary-fixed": "#360f00",
+                      "tertiary-fixed": "#ffdbcd",
+                      "primary": "#004ac6",
+                      "surface-bright": "#faf8ff",
+                      "surface-container-highest": "#dae2fd",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "surface-tint": "#0053db",
+                      "primary-container": "#2563eb",
+                      "tertiary-container": "#bc4800",
+                      "on-error": "#ffffff",
+                      "secondary-fixed": "#d5e3fc",
+                      "on-background": "#131b2e",
+                      "surface": "#faf8ff",
+                      "on-secondary-container": "#57657a",
+                      "error-container": "#ffdad6",
+                      "inverse-primary": "#b4c5ff",
+                      "on-primary": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "outline": "#737686",
+                      "surface-container-lowest": "#ffffff",
+                      "background": "#faf8ff",
+                      "tertiary": "#943700",
+                      "surface-variant": "#dae2fd",
+                      "secondary": "#515f74",
+                      "on-error-container": "#93000a",
+                      "primary-fixed": "#dbe1ff",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#d2d9f4",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "surface-container": "#eaedff",
+                      "warning": "#f59e0b",
+                      "on-tertiary-fixed-variant": "#7d2d00",
+                      "error": "#ef4444",
+                      "secondary-fixed-dim": "#b9c7df",
+                      "secondary-container": "#d5e3fc",
+                      "surface-container-high": "#e2e7ff",
+                      "success": "#10b981",
+                      "on-primary-fixed": "#00174b",
+                      "inverse-surface": "#283044",
+                      "outline-variant": "#c3c6d7",
+                      "inverse-on-surface": "#eef0ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "margin-page": "24px",
+                      "sidebar-collapsed": "64px",
+                      "base": "4px",
+                      "sidebar-width": "260px",
+                      "topbar-height": "56px"
+              },
+              "fontFamily": {
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "mono-data": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "mono-data": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            },
+          }
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+          font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Timeline specific styles */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 24px;
+            bottom: -24px;
+            width: 2px;
+            background-color: theme('colors.border');
+            z-index: 0;
+        }
+        .timeline-item:last-child .timeline-line::before {
+            display: none;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="hidden md:flex flex-col h-screen w-sidebar-width fixed left-0 top-0 bg-surface-container-lowest border-r border-border py-4 z-50">
+<div class="px-gutter mb-6">
+<h1 class="text-headline-sm font-headline-lg text-primary tracking-tight">Lavoro Esterno</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">Enterprise Data</p>
+</div>
+<ul class="flex flex-col gap-1 px-3 flex-grow">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-body-md font-body-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="text-body-md font-body-md">Search</span>
+</a>
+</li>
+<!-- Active Tab: Records (closest match for 'History') -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-secondary-container text-on-secondary-container font-semibold transition-all duration-150 opacity-90" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+<span class="text-body-md font-body-md">Records</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="source">source</span>
+<span class="text-body-md font-body-md">Sources</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="cloud_download">cloud_download</span>
+<span class="text-body-md font-body-md">Exports</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-body-md font-body-md">Admin</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto px-3">
+<div class="h-px bg-border my-2"></div>
+<ul class="flex flex-col gap-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="text-body-md font-body-md">Profile</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="text-body-md font-body-md">Logout</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-sidebar-width flex flex-col min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-40 bg-surface border-b border-border h-topbar-height">
+<div class="flex items-center gap-4">
+<!-- Mobile Menu Toggle (Visible only on small screens) -->
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded p-1">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center text-label-sm font-label-sm text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Records</a>
+<span class="material-symbols-outlined text-[16px] mx-1">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">REC-9824</a>
+<span class="material-symbols-outlined text-[16px] mx-1">chevron_right</span>
+<span class="text-on-surface font-semibold">History</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="text-on-secondary-container hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded-full p-2">
+<span class="material-symbols-outlined" data-icon="sensors">sensors</span>
+</button>
+<button class="text-on-secondary-container hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container rounded-full p-2 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="h-6 w-px bg-border mx-1"></div>
+<button class="text-label-sm font-label-sm text-on-secondary-container hover:text-primary transition-colors px-2">Support</button>
+<button class="flex items-center gap-2 bg-surface-container-low hover:bg-surface-container rounded-full pl-2 pr-4 py-1 ml-2 transition-colors border border-border">
+<img alt="User Profile" class="w-6 h-6 rounded-full object-cover" data-alt="A small, professional headshot of an individual in a corporate setting, well-lit, neutral background, suitable for a web application avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZqh8j-u26y8T4PUKbeJdNXykbGAS4Ci_w0oINWoBmb-fDhyOWiUFidb2QhCoumzuNKsvJU5AtYLH55GMNZ7TBi-hwVJcy2F2QGmc6PP8NBI1EVyyje2jYsYOb25VrJIkaqFNImRfXTN6mCVzwGPeyZd3jPp8fG3PLcm1ILAUhOQhSq2M6ckgb0tu7jwPS9OYSOsAf8aPXNh0Ht5G7OKyg6nvvEKCX7S9_8VuoMo1fQ7UtWqFYVCm-xg">
+<span class="text-label-sm font-label-sm font-semibold text-primary">Account</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 p-margin-page overflow-y-auto">
+<!-- Record Header Context -->
+<div class="mb-8 pb-6 border-b border-border flex justify-between items-end">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<h2 class="text-headline-md font-headline-md text-on-surface">Record History</h2>
+<span class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm px-2 py-1 rounded border border-border flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">database</span> REC-9824
+                        </span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant">Comprehensive audit log of automated and manual modifications.</p>
+</div>
+<!-- Tab Navigation (Local to Record Detail) -->
+<div class="flex gap-2">
+<a class="px-4 py-2 rounded text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-low transition-colors border border-transparent hover:border-border" href="#">Overview</a>
+<a class="px-4 py-2 rounded text-body-md font-body-md text-on-surface-variant hover:bg-surface-container-low transition-colors border border-transparent hover:border-border" href="#">Media</a>
+<button class="px-4 py-2 rounded text-body-md font-body-md bg-surface text-primary font-semibold border-b-2 border-primary shadow-sm">History</button>
+</div>
+</div>
+<!-- Timeline Section -->
+<div class="max-w-4xl mx-auto bg-surface border border-border rounded-xl p-8 shadow-sm">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+                         Audit Trail
+                     </h3>
+<div class="flex gap-2">
+<button class="flex items-center gap-1 px-3 py-1.5 border border-border rounded text-label-sm font-label-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">filter_list</span> Filter
+                         </button>
+<button class="flex items-center gap-1 px-3 py-1.5 border border-border rounded text-label-sm font-label-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">download</span> Export
+                         </button>
+</div>
+</div>
+<div class="relative space-y-6">
+<!-- Event 1: Media Classification Change -->
+<div class="timeline-item relative pl-12">
+<div class="timeline-line absolute left-0 top-0 h-full w-10 flex justify-center">
+<div class="w-10 h-10 rounded-full bg-surface-container-low border border-border flex items-center justify-center z-10 mt-1">
+<span class="material-symbols-outlined text-info text-[20px]">category</span>
+</div>
+</div>
+<div class="bg-surface-bright border border-border rounded-lg p-4 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-headline-sm text-on-surface font-semibold">Media Classification Change</span>
+<span class="px-2 py-0.5 rounded-full bg-info/10 text-info text-[10px] font-mono-data font-semibold uppercase tracking-wider">Manual</span>
+</div>
+<span class="text-mono-data font-mono-data text-on-surface-variant text-sm">2023-10-27 14:32:11 UTC</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant mb-3">User reclassified primary image asset.</p>
+<div class="bg-surface-container-low rounded border border-border p-3 flex items-center gap-4">
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Previous</span>
+<span class="text-body-md font-mono-data text-on-surface line-through decoration-error">Unknown_Artifact</span>
+</div>
+<span class="material-symbols-outlined text-outline">arrow_forward</span>
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-on-surface-variant">New</span>
+<span class="text-body-md font-mono-data text-on-surface">Verified_Document</span>
+</div>
+</div>
+<div class="mt-3 flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">person</span>
+<span>Sarah Jenkins (Analyst Tier 2)</span>
+</div>
+</div>
+</div>
+<!-- Event 2: AI Summary Regeneration -->
+<div class="timeline-item relative pl-12">
+<div class="timeline-line absolute left-0 top-0 h-full w-10 flex justify-center">
+<div class="w-10 h-10 rounded-full bg-surface-container-low border border-border flex items-center justify-center z-10 mt-1">
+<span class="material-symbols-outlined text-primary text-[20px]">smart_toy</span>
+</div>
+</div>
+<div class="bg-surface-bright border border-border rounded-lg p-4 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-headline-sm text-on-surface font-semibold">AI Summary Regeneration</span>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-mono-data font-semibold uppercase tracking-wider">System</span>
+</div>
+<span class="text-mono-data font-mono-data text-on-surface-variant text-sm">2023-10-27 10:15:45 UTC</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant mb-3">Automated background job triggered summary update due to new data ingest.</p>
+<div class="bg-surface-container-low rounded p-3 border-l-4 border-primary">
+<p class="text-body-md font-body-md text-on-surface italic line-clamp-2">"Updated entity analysis indicates a high probability of association with secondary shell corporation located in offshore jurisdiction..."</p>
+</div>
+<div class="mt-3 flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">memory</span>
+<span>Model: LLM-Core-v4.2</span>
+</div>
+</div>
+</div>
+<!-- Event 3: Canonical Override -->
+<div class="timeline-item relative pl-12">
+<div class="timeline-line absolute left-0 top-0 h-full w-10 flex justify-center">
+<div class="w-10 h-10 rounded-full bg-error-container border border-error/20 flex items-center justify-center z-10 mt-1">
+<span class="material-symbols-outlined text-on-error-container text-[20px]">edit_note</span>
+</div>
+</div>
+<div class="bg-surface-bright border border-border rounded-lg p-4 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-headline-sm text-on-surface font-semibold">Canonical Override Applied</span>
+<span class="px-2 py-0.5 rounded-full bg-warning/10 text-warning text-[10px] font-mono-data font-semibold uppercase tracking-wider">Admin</span>
+</div>
+<span class="text-mono-data font-mono-data text-on-surface-variant text-sm">2023-10-26 16:44:02 UTC</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant mb-3">Administrator forced canonical value selection over automated suggestion.</p>
+<div class="grid grid-cols-2 gap-4 mb-3">
+<div class="bg-surface-container-low p-2 rounded border border-border">
+<span class="text-label-sm font-label-sm text-on-surface-variant block mb-1">Field</span>
+<span class="text-mono-data font-mono-data text-on-surface">Registered_Address</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded border border-border">
+<span class="text-label-sm font-label-sm text-on-surface-variant block mb-1">Value Forced</span>
+<span class="text-mono-data font-mono-data text-on-surface">1200 Commerce St, Suite 400</span>
+</div>
+</div>
+<div class="bg-error-container/30 rounded p-3 border-l-4 border-warning mb-3">
+<span class="text-label-sm font-label-sm font-semibold text-on-surface block mb-1">Motivation provided:</span>
+<p class="text-body-md font-body-md text-on-surface">"Cross-referenced with verified physical site visit report submitted on 10/25. Automated scrape is pulling outdated historical data from state registry."</p>
+</div>
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+<span>Marcus Thorne (Lead Data Steward)</span>
+</div>
+</div>
+</div>
+<!-- Event 4: New Occurrence Discovered -->
+<div class="timeline-item relative pl-12">
+<div class="timeline-line absolute left-0 top-0 h-full w-10 flex justify-center">
+<div class="w-10 h-10 rounded-full bg-surface-container-low border border-border flex items-center justify-center z-10 mt-1">
+<span class="material-symbols-outlined text-success text-[20px]">add_circle</span>
+</div>
+</div>
+<div class="bg-surface-bright border border-border rounded-lg p-4 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-headline-sm text-on-surface font-semibold">New Occurrence Discovered</span>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-mono-data font-semibold uppercase tracking-wider">System</span>
+</div>
+<span class="text-mono-data font-mono-data text-on-surface-variant text-sm">2023-10-25 08:22:19 UTC</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant mb-3">Scraping engine identified new entity mention matching record fingerprint.</p>
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">download_for_offline</span>
+<span>Source: Scraper_Node_EU_West</span>
+<span class="mx-2 text-border">|</span>
+<span class="material-symbols-outlined text-[16px]">link</span>
+<a class="text-primary hover:underline font-mono-data" href="#">ref_id: 884-A2</a>
+</div>
+</div>
+</div>
+<!-- Event 5: Record Created -->
+<div class="timeline-item relative pl-12">
+<div class="timeline-line absolute left-0 top-0 h-full w-10 flex justify-center">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest border border-outline-variant flex items-center justify-center z-10 mt-1">
+<span class="material-symbols-outlined text-on-surface text-[20px]">fiber_new</span>
+</div>
+</div>
+<div class="bg-surface-container-low border border-border rounded-lg p-4">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-headline-sm text-on-surface font-semibold">Record Initialized</span>
+<span class="px-2 py-0.5 rounded-full bg-outline/10 text-outline text-[10px] font-mono-data font-semibold uppercase tracking-wider">System</span>
+</div>
+<span class="text-mono-data font-mono-data text-on-surface-variant text-sm">2023-10-25 08:22:15 UTC</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant">Initial entity shell created in database structure.</p>
+<div class="mt-3 flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">dns</span>
+<span>System Core (Auto-provision)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-center">
+<button class="px-4 py-2 border border-border rounded-lg text-body-md font-body-md font-medium text-on-surface-variant hover:bg-surface-container-low transition-colors bg-surface">
+                        Load Older Events
+                    </button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

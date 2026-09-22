@@ -1,0 +1,68 @@
+{
+  "annotations": {"list": []}, "editable": false, "graphTooltip": 1, "id": null,
+  "links": [
+    {"title": "API Health", "type": "link", "url": "/d/lavoro-esterno-api/api-health"},
+    {"title": "Celery Workers", "type": "link", "url": "/d/lavoro-esterno-celery/celery-workers"}
+  ],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}, "id": 1,
+      "fieldConfig": {"defaults": {"thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "auto", "textMode": "auto"},
+      "targets": [{"expr": "lavoro_esterno_scrape_metrics_collector_up", "instant": true, "refId": "A"}], "title": "Scrape metrics collector", "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}, "id": 2,
+      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "textMode": "auto"},
+      "targets": [{"expr": "sum(lavoro_esterno_scrape_runs{window=\"24h\",source=~\"$source\"})", "instant": true, "refId": "A"}], "title": "Runs (24h)", "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}, "id": 3,
+      "fieldConfig": {"defaults": {"thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "red", "value": 1}]}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "textMode": "auto"},
+      "targets": [{"expr": "sum(lavoro_esterno_scrape_runs{window=\"24h\",status=\"failed\",source=~\"$source\"})", "instant": true, "refId": "A"}], "title": "Failed runs (24h)", "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}, "id": 4,
+      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "textMode": "auto"},
+      "targets": [{"expr": "sum(lavoro_esterno_scrape_items_new{window=\"24h\",source=~\"$source\"})", "instant": true, "refId": "A"}], "title": "New ads (24h)", "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}, "id": 5,
+      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"legend": {"displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [
+        {"expr": "lavoro_esterno_scrape_runs{window=\"7d\",status=\"completed\",source=~\"$source\"}", "legendFormat": "success {{source}}", "refId": "A"},
+        {"expr": "lavoro_esterno_scrape_runs{window=\"7d\",status=\"failed\",source=~\"$source\"}", "legendFormat": "failed {{source}}", "refId": "B"}
+      ], "title": "Run outcomes by source (7d rolling)", "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}, "id": 6,
+      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"legend": {"displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [{"expr": "lavoro_esterno_scrape_items_new{window=\"7d\",source=~\"$source\"}", "legendFormat": "{{source}}", "refId": "A"}], "title": "New ads by source (7d rolling)", "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 7, "w": 8, "x": 0, "y": 12}, "id": 7,
+      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"showHeader": true},
+      "targets": [{"expr": "lavoro_esterno_scrape_last_run_status{source=~\"$source\"} == 1", "format": "table", "instant": true, "refId": "A"}], "title": "Latest status by source", "type": "table"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 7, "w": 8, "x": 8, "y": 12}, "id": 8,
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []}, "options": {"showHeader": true},
+      "targets": [{"expr": "time() - lavoro_esterno_scrape_last_success_timestamp_seconds{source=~\"$source\"}", "format": "table", "instant": true, "legendFormat": "{{source}}", "refId": "A"}], "title": "Age of last success", "type": "table"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"}, "gridPos": {"h": 7, "w": 8, "x": 16, "y": 12}, "id": 9,
+      "fieldConfig": {"defaults": {"thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "red", "value": 3}]}}, "overrides": []}, "options": {"showHeader": true},
+      "targets": [{"expr": "lavoro_esterno_scrape_consecutive_failures{source=~\"$source\"} or lavoro_esterno_scrape_running_duration_seconds{source=~\"$source\"}", "format": "table", "instant": true, "refId": "A"}], "title": "Failures / running duration", "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"}, "gridPos": {"h": 7, "w": 24, "x": 0, "y": 19}, "id": 10,
+      "options": {"dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": false, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "targets": [{"expr": "{service=\"worker-scraper\"} |~ \"$source\"", "refId": "A"}], "title": "Scraper logs", "type": "logs"
+    }
+  ],
+  "refresh": "30s", "schemaVersion": 42, "tags": ["lavoro-esterno", "scraping"],
+  "templating": {"list": [{"allValue": ".*", "current": {"selected": true, "text": "All", "value": "$__all"}, "datasource": {"type": "prometheus", "uid": "prometheus"}, "definition": "label_values(lavoro_esterno_scrape_last_run_status, source)", "includeAll": true, "label": "Source", "multi": true, "name": "source", "query": {"query": "label_values(lavoro_esterno_scrape_last_run_status, source)", "refId": "PrometheusVariableQueryEditor-VariableQuery"}, "refresh": 1, "type": "query"}]},
+  "time": {"from": "now-7d", "to": "now"}, "timezone": "browser",
+  "title": "Scraping Sources", "uid": "lavoro-esterno-scraping", "version": 1
+}
