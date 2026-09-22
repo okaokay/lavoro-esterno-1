@@ -101,6 +101,15 @@ class ProxyPoolExhaustedError(PageFetchError):
         self.category = category
 
 
+class BrowserPaginationError(Exception):
+    """Errore browser classificato senza conservare dettagli della pagina."""
+
+    def __init__(self, reason: str, safe_message: str):
+        super().__init__(safe_message)
+        self.reason = reason
+        self.safe_message = safe_message
+
+
 @dataclass
 class DiscoveryDiagnostics:
     pages_visited: int = 0
@@ -595,6 +604,99 @@ class GenericScraper(Scraper):
                 return candidate
         return None
 
+    @staticmethod
+    def _browser_failure_reason(page: Any, exc: Exception, *, during_click: bool) -> str:
+        """Classifica un errore Playwright senza propagarne testo o URL."""
+        try:
+            if page.is_closed():
+                return "page_closed"
+        except Exception:  # noqa: BLE001 - anche l'ispezione puo fallire a browser chiuso
+            pass
+        try:
+            browser = page.context.browser
+            if browser is not None and not browser.is_connected():
+                return "browser_closed"
+        except Exception:  # noqa: BLE001 - contesto gia distrutto
+            pass
+
+        # Il dettaglio resta in memoria: serve solo a distinguere errori che
+        # Playwright non espone con sottoclassi pubbliche specifiche.
+        detail = f"{type(exc).__name__} {exc}".lower()
+        if "browser has been closed" in detail or "browser closed" in detail:
+            return "browser_closed"
+        if (
+            "page has been closed" in detail
+            or "target page, context or browser has been closed" in detail
+        ):
+            return "page_closed"
+        if "detached" in detail or "not attached" in detail:
+            return "next_control_detached"
+        if "timeout" in detail and not during_click:
+            return "browser_navigation_timeout"
+        return "browser_click_failed" if during_click else "browser_navigation_timeout"
+
+    @staticmethod
+    def _pagination_error_message(reason: str) -> str:
+        return {
+            "browser_click_failed": (
+                "Il browser non e riuscito ad attivare il controllo Next. "
+                "Verificare che il selettore identifichi un elemento cliccabile."
+            ),
+            "browser_navigation_timeout": (
+                "La pagina successiva non ha completato il caricamento entro il timeout."
+            ),
+            "next_control_detached": (
+                "Il controllo Next e stato sostituito dalla pagina prima del click."
+            ),
+            "page_closed": "La pagina browser e stata chiusa durante la paginazione.",
+            "browser_closed": "Il browser si e chiuso durante la paginazione.",
+            "cross_origin_popup": (
+                "Il controllo Next ha aperto una pagina appartenente a un'origine diversa."
+            ),
+            "page_did_not_change": (
+                "Il controllo Next non ha modificato URL, annunci o contenitore "
+                "entro il timeout."
+            ),
+        }.get(reason, "Errore browser durante la paginazione.")
+
+    def _set_browser_pagination_failure(self, reason: str) -> None:
+        self.discovery_diagnostics.stop_reason = reason
+        message = self._pagination_error_message(reason)
+        if message not in self.discovery_diagnostics.errors:
+            self.discovery_diagnostics.errors.append(message)
+
+    async def _browser_listing_state(
+        self,
+        browser_page: Any,
+        ad_link_selector: str,
+        ad_link_selector_type: str,
+    ) -> tuple[str, list[str], str]:
+        """Rileva URL, link e digest DOM senza restituire contenuti HTML."""
+        current_url = str(browser_page.url)
+        ad_locator = browser_page.locator(
+            self._browser_selector(ad_link_selector, ad_link_selector_type)
+        )
+        state = await ad_locator.evaluate_all(
+            """(elements) => {
+                const links = elements
+                  .map((element) => element.getAttribute('href'))
+                  .filter(Boolean);
+                const container = elements.length > 0
+                  ? (elements[0].parentElement || elements[0])
+                  : document.body;
+                const value = container ? container.innerHTML : '';
+                let hash = 2166136261;
+                for (let index = 0; index < value.length; index += 1) {
+                  hash ^= value.charCodeAt(index);
+                  hash = Math.imul(hash, 16777619);
+                }
+                return {links, containerHash: (hash >>> 0).toString(16)};
+            }"""
+        )
+        hrefs = [str(item) for item in state.get("links", [])]
+        absolute_hrefs = [urljoin(current_url, href) for href in hrefs]
+        return current_url, absolute_hrefs, str(state.get("containerHash", ""))
+
     def _add_ad_urls(
         self,
         urls: list[str],
@@ -726,17 +828,16 @@ class GenericScraper(Scraper):
             ) -> None:
                 nonlocal stop_all
                 for page_index in range(max_pages):
-                    current_url = str(browser_page.url)
-                    ad_locator = browser_page.locator(
-                        self._browser_selector(ad_link_selector, ad_link_selector_type)
+                    current_url, absolute_hrefs, container_hash = (
+                        await self._browser_listing_state(
+                            browser_page, ad_link_selector, ad_link_selector_type
+                        )
                     )
-                    hrefs = await ad_locator.evaluate_all(
-                        "(elements) => elements.map((element) => "
-                        "element.getAttribute('href')).filter(Boolean)"
-                    )
-                    absolute_hrefs = [urljoin(current_url, str(href)) for href in hrefs]
+                    hrefs = absolute_hrefs
                     fingerprint = json.dumps(
-                        [current_url, absolute_hrefs], ensure_ascii=False, separators=(",", ":")
+                        [current_url, absolute_hrefs, container_hash],
+                        ensure_ascii=False,
+                        separators=(",", ":"),
                     )
                     if fingerprint in seen_pages:
                         self.discovery_diagnostics.stop_reason = "repeated_page"
@@ -750,7 +851,7 @@ class GenericScraper(Scraper):
                         urls,
                         seen_urls,
                         current_url,
-                        [str(href) for href in hrefs],
+                        hrefs,
                         max_ads,
                         page_index + 1,
                     ):
@@ -795,7 +896,14 @@ class GenericScraper(Scraper):
                     href = equivalent_next_url or await control.get_attribute("href")
                     before_url = current_url
                     before_links = json.dumps(absolute_hrefs, separators=(",", ":"))
+                    before_container = container_hash
+                    original_page = browser_page
+                    try:
+                        known_pages = set(browser_page.context.pages)
+                    except Exception:  # noqa: BLE001 - verificato dopo il click
+                        known_pages = {browser_page}
                     await asyncio.sleep(self.rate_limit_seconds)
+                    click_error: Exception | None = None
                     if href:
                         next_url = urldefrag(urljoin(current_url, href)).url
                         if not self._same_origin(start_url, next_url):
@@ -807,41 +915,107 @@ class GenericScraper(Scraper):
                         if not is_allowed(self._robots_txt, next_url, self.user_agent):
                             raise RobotsDisallowedError(next_url)
                         self.discovery_diagnostics.pagination_mode = "href"
-                        await browser_page.goto(
-                            next_url,
-                            wait_until="domcontentloaded",
-                            timeout=_BROWSER_NAVIGATION_TIMEOUT_MS,
-                        )
+                        try:
+                            await browser_page.goto(
+                                next_url,
+                                wait_until="domcontentloaded",
+                                timeout=_BROWSER_NAVIGATION_TIMEOUT_MS,
+                            )
+                        except Exception as exc:  # noqa: BLE001 - categorizzato senza dettagli
+                            reason = self._browser_failure_reason(
+                                browser_page, exc, during_click=False
+                            )
+                            raise BrowserPaginationError(
+                                reason, self._pagination_error_message(reason)
+                            ) from None
                     else:
                         self.discovery_diagnostics.pagination_mode = "click"
-                        # Il selettore e univoco, visibile e abilitato. Il click DOM
-                        # evita che un overlay puramente visuale intercetti il comando.
-                        await control.evaluate("(element) => element.click()")
+                        # Il click Playwright forzato supera gli overlay visuali e
+                        # genera un evento utente reale quando il controllo riceve
+                        # gli eventi del puntatore. Se un overlay lo copre, il
+                        # dispatch Playwright sul locator evita di cliccare
+                        # l'overlay senza eseguire un secondo tentativo.
+                        try:
+                            receives_pointer = await control.evaluate(
+                                """(element) => {
+                                    const rect = element.getBoundingClientRect();
+                                    const x = rect.left + (rect.width / 2);
+                                    const y = rect.top + (rect.height / 2);
+                                    const hit = document.elementFromPoint(x, y);
+                                    return hit === element || element.contains(hit);
+                                }"""
+                            )
+                            if receives_pointer:
+                                await control.click(
+                                    force=True,
+                                    no_wait_after=True,
+                                    timeout=_BROWSER_NAVIGATION_TIMEOUT_MS,
+                                )
+                            else:
+                                await control.dispatch_event("click")
+                        except Exception as exc:  # noqa: BLE001 - puo avere gia navigato
+                            click_error = exc
 
                     deadline = time.monotonic() + (_PAGINATION_CHANGE_TIMEOUT_MS / 1000)
                     page_changed = False
+                    navigation_started = False
                     while time.monotonic() < deadline:
-                        after_url = str(browser_page.url)
-                        after_locator = browser_page.locator(
-                            self._browser_selector(ad_link_selector, ad_link_selector_type)
-                        )
-                        after_hrefs = await after_locator.evaluate_all(
-                            "(elements) => elements.map((element) => "
-                            "element.getAttribute('href')).filter(Boolean)"
-                        )
-                        after_links = json.dumps(
-                            [urljoin(after_url, str(item)) for item in after_hrefs],
-                            separators=(",", ":"),
-                        )
-                        if after_url != before_url or after_links != before_links:
-                            page_changed = True
-                            break
+                        try:
+                            popup = next(
+                                (
+                                    page
+                                    for page in browser_page.context.pages
+                                    if page not in known_pages and not page.is_closed()
+                                ),
+                                None,
+                            )
+                            if popup is not None:
+                                popup_url = str(popup.url)
+                                if popup_url != "about:blank":
+                                    if not self._same_origin(start_url, popup_url):
+                                        self._set_browser_pagination_failure(
+                                            "cross_origin_popup"
+                                        )
+                                        return
+                                    browser_page = popup
+                                    navigation_started = True
+
+                            after_url, after_hrefs, after_container = (
+                                await self._browser_listing_state(
+                                    browser_page,
+                                    ad_link_selector,
+                                    ad_link_selector_type,
+                                )
+                            )
+                            after_links = json.dumps(after_hrefs, separators=(",", ":"))
+                            if (
+                                browser_page is not original_page
+                                or after_url != before_url
+                                or after_links != before_links
+                                or after_container != before_container
+                            ):
+                                page_changed = True
+                                break
+                        except Exception as exc:  # noqa: BLE001 - transitorio durante navigation
+                            reason = self._browser_failure_reason(
+                                browser_page, exc, during_click=False
+                            )
+                            if reason in {"page_closed", "browser_closed"}:
+                                raise BrowserPaginationError(
+                                    reason, self._pagination_error_message(reason)
+                                ) from None
+                            navigation_started = True
                         await asyncio.sleep(0.2)
                     if not page_changed:
-                        self.discovery_diagnostics.stop_reason = "page_did_not_change"
-                        self.discovery_diagnostics.errors.append(
-                            "Il controllo Next non ha modificato URL o annunci entro il timeout."
-                        )
+                        if click_error is not None:
+                            reason = self._browser_failure_reason(
+                                browser_page, click_error, during_click=True
+                            )
+                        elif navigation_started:
+                            reason = "browser_navigation_timeout"
+                        else:
+                            reason = "page_did_not_change"
+                        self._set_browser_pagination_failure(reason)
                         break
                     if not self._same_origin(start_url, str(browser_page.url)):
                         self.discovery_diagnostics.stop_reason = "cross_origin_blocked"
@@ -859,11 +1033,10 @@ class GenericScraper(Scraper):
                     await paginate_pages(browser_page)
                 except RobotsDisallowedError as exc:
                     action_errors.append(exc)
+                except BrowserPaginationError as exc:
+                    self._set_browser_pagination_failure(exc.reason)
                 except Exception:  # noqa: BLE001 - il dettaglio puo contenere URL/dati pagina
-                    self.discovery_diagnostics.stop_reason = "browser_pagination_failed"
-                    self.discovery_diagnostics.errors.append(
-                        "Errore browser durante la paginazione."
-                    )
+                    self._set_browser_pagination_failure("browser_navigation_timeout")
 
             await self._with_proxy_rotation(
                 "discovery",

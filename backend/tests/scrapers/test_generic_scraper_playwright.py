@@ -120,10 +120,48 @@ def javascript_pagination_site_url() -> Iterator[str]:
       });
       render();
     </script></body></html>"""
+    navigation_one = b"""<!doctype html><html><body>
+      <div id="ads"><a class="ad-link" href="/ad1.html">Ad 1</a></div>
+      <button class="next" onclick="location.href='/navigation-2.html'">Next</button>
+    </body></html>"""
+    navigation_two = b"""<!doctype html><html><body>
+      <div id="ads"><a class="ad-link" href="/ad2.html">Ad 2</a></div>
+    </body></html>"""
+    popup_one = b"""<!doctype html><html><body>
+      <div id="ads"><a class="ad-link" href="/ad1.html">Ad 1</a></div>
+      <button class="next" onclick="window.open('/popup-2.html', '_blank')">Next</button>
+    </body></html>"""
+    popup_two = b"""<!doctype html><html><body>
+      <div id="ads"><a class="ad-link" href="/ad2.html">Ad 2</a></div>
+    </body></html>"""
+    replaced_container = b"""<!doctype html><html><body>
+      <div id="ads"><a class="ad-link" href="/same.html">Version one</a></div>
+      <button class="next">Next</button>
+      <script>
+        document.querySelector('.next').addEventListener('click', () => {
+          document.querySelector('#ads').innerHTML =
+            '<a class="ad-link" href="/same.html">Version two</a>';
+          document.querySelector('.next').remove();
+        });
+      </script>
+    </body></html>"""
 
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
-            body = b"User-agent: *\nAllow: /\n" if self.path == "/robots.txt" else listing
+            if self.path == "/robots.txt":
+                body = b"User-agent: *\nAllow: /\n"
+            elif self.path == "/navigation-1.html":
+                body = navigation_one
+            elif self.path == "/navigation-2.html":
+                body = navigation_two
+            elif self.path == "/popup-1.html":
+                body = popup_one
+            elif self.path == "/popup-2.html":
+                body = popup_two
+            elif self.path == "/replaced-container.html":
+                body = replaced_container
+            else:
+                body = listing
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
@@ -393,6 +431,64 @@ async def test_discover_clicks_javascript_next_under_overlay_and_deduplicates(
     assert scraper.discovery_diagnostics.unique_ads_found == 4
 
 
+async def test_browser_click_supports_full_navigation(
+    _chromium_ready: None, javascript_pagination_site_url: str
+) -> None:
+    scraper = _scraper(
+        javascript_pagination_site_url,
+        start_urls=[f"{javascript_pagination_site_url}/navigation-1.html"],
+        next_page_selector="button.next",
+        max_pages=3,
+    )
+    try:
+        urls = await scraper.discover()
+    finally:
+        await scraper.aclose()
+
+    assert [url.rsplit("/", 1)[-1] for url in urls] == ["ad1.html", "ad2.html"]
+    assert scraper.discovery_diagnostics.pages_visited == 2
+    assert scraper.discovery_diagnostics.pagination_mode == "click"
+    assert scraper.discovery_diagnostics.stop_reason == "end_of_pagination"
+
+
+async def test_browser_click_adopts_same_origin_popup(
+    _chromium_ready: None, javascript_pagination_site_url: str
+) -> None:
+    scraper = _scraper(
+        javascript_pagination_site_url,
+        start_urls=[f"{javascript_pagination_site_url}/popup-1.html"],
+        next_page_selector="button.next",
+        max_pages=3,
+    )
+    try:
+        urls = await scraper.discover()
+    finally:
+        await scraper.aclose()
+
+    assert [url.rsplit("/", 1)[-1] for url in urls] == ["ad1.html", "ad2.html"]
+    assert scraper.discovery_diagnostics.pages_visited == 2
+    assert scraper.discovery_diagnostics.stop_reason == "end_of_pagination"
+
+
+async def test_browser_click_detects_listing_container_replacement(
+    _chromium_ready: None, javascript_pagination_site_url: str
+) -> None:
+    scraper = _scraper(
+        javascript_pagination_site_url,
+        start_urls=[f"{javascript_pagination_site_url}/replaced-container.html"],
+        next_page_selector="button.next",
+        max_pages=3,
+    )
+    try:
+        urls = await scraper.discover()
+    finally:
+        await scraper.aclose()
+
+    assert [url.rsplit("/", 1)[-1] for url in urls] == ["same.html"]
+    assert scraper.discovery_diagnostics.pages_visited == 2
+    assert scraper.discovery_diagnostics.stop_reason == "end_of_pagination"
+
+
 async def test_http_mode_reports_javascript_only_pagination(
     javascript_pagination_site_url: str,
 ) -> None:
@@ -436,7 +532,7 @@ async def test_browser_reports_click_that_does_not_change_page(
     assert scraper.discovery_diagnostics.pages_visited == 1
     assert scraper.discovery_diagnostics.stop_reason == "page_did_not_change"
     assert scraper.discovery_diagnostics.errors == [
-        "Il controllo Next non ha modificato URL o annunci entro il timeout."
+        "Il controllo Next non ha modificato URL, annunci o contenitore entro il timeout."
     ]
 
 

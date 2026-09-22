@@ -83,6 +83,68 @@ const RUN_STATUS_LABEL: Record<ScrapeRunStatus, string> = {
   failed: "Non riuscita",
 };
 
+const PAGINATION_STOP_DETAILS: Record<string, { label: string; suggestion?: string }> = {
+  not_started: { label: "Non avviata" },
+  completed: { label: "Completata" },
+  max_pages: { label: "Raggiunto il limite di pagine" },
+  max_ads: { label: "Raggiunto il limite di annunci" },
+  end_of_pagination: { label: "Ultima pagina raggiunta" },
+  no_pagination_configured: { label: "Paginazione non configurata" },
+  repeated_page: {
+    label: "Pagina già visitata",
+    suggestion: "Verifica che il controllo Avanti non riporti a una pagina precedente.",
+  },
+  ambiguous_next_control: {
+    label: "Controllo Avanti ambiguo",
+    suggestion: "Usa un selettore che identifichi esclusivamente il controllo Avanti.",
+  },
+  next_control_unavailable: {
+    label: "Controllo Avanti non disponibile",
+    suggestion: "Verifica che il controllo sia visibile e abilitato al termine del caricamento.",
+  },
+  click_requires_browser: {
+    label: "Il click richiede un browser",
+    suggestion: "Seleziona la modalità Dinamica o Stealth.",
+  },
+  cross_origin_blocked: {
+    label: "Navigazione verso un'altra origine bloccata",
+    suggestion: "Il controllo Avanti deve rimanere sul dominio configurato per la fonte.",
+  },
+  cross_origin_popup: {
+    label: "Popup verso un'altra origine bloccato",
+    suggestion: "Configura un controllo Avanti che apra una pagina dello stesso sito.",
+  },
+  browser_click_failed: {
+    label: "Click del browser non riuscito",
+    suggestion: "Verifica che il selettore identifichi un elemento realmente cliccabile.",
+  },
+  browser_navigation_timeout: {
+    label: "Caricamento della pagina scaduto",
+    suggestion: "Controlla tempi di risposta, protezioni anti-bot e stato del proxy.",
+  },
+  next_control_detached: {
+    label: "Controllo Avanti sostituito durante il click",
+    suggestion: "Usa un selettore stabile e, se disponibile, configura un selettore di attesa.",
+  },
+  page_closed: {
+    label: "Pagina browser chiusa",
+    suggestion: "Controlla se il sito chiude o sostituisce la scheda dopo il click.",
+  },
+  browser_closed: {
+    label: "Browser chiuso durante la paginazione",
+    suggestion: "Controlla memoria e log del worker scraper, quindi riprova.",
+  },
+  page_did_not_change: {
+    label: "La pagina non è cambiata",
+    suggestion: "Verifica il selettore Avanti e che il controllo non sia già sull'ultima pagina.",
+  },
+};
+
+function paginationStopDetails(reason: string | null | undefined) {
+  if (!reason) return null;
+  return PAGINATION_STOP_DETAILS[reason] ?? { label: reason };
+}
+
 // Threshold mirrors backend/app/api/v1/sources.py:CONSECUTIVE_FAILURES_ALERT_THRESHOLD.
 const CONSECUTIVE_FAILURES_ALERT_THRESHOLD = 3;
 
@@ -123,7 +185,9 @@ function SourceRunsPanel({ sourceId, colSpan }: { sourceId: string; colSpan: num
         )}
         {runs.data && runs.data.length > 0 && (
           <div className="space-y-3">
-            {runs.data.map((run) => (
+            {runs.data.map((run) => {
+              const stopDetails = paginationStopDetails(run.paginationStopReason);
+              return (
               <div key={run.id} className="bg-surface-container-lowest border border-border rounded-lg p-3">
                 <div className="flex flex-wrap items-center gap-3 justify-between">
                   <div className="flex items-center gap-3">
@@ -149,10 +213,14 @@ function SourceRunsPanel({ sourceId, colSpan }: { sourceId: string; colSpan: num
                     </span>
                   </div>
                 </div>
-                {run.paginationStopReason && (
-                  <p className="mt-1 text-label-sm text-on-surface-variant">
-                    Stop reason: <span className="font-mono">{run.paginationStopReason}</span>
-                  </p>
+                {stopDetails && (
+                  <div className="mt-1 text-label-sm text-on-surface-variant">
+                    <p>
+                      Arresto paginazione: {stopDetails.label}{" "}
+                      <span className="font-mono">({run.paginationStopReason})</span>
+                    </p>
+                    {stopDetails.suggestion && <p>{stopDetails.suggestion}</p>}
+                  </div>
                 )}
                 {run.scheduledFor && (
                   <p className="mt-1 text-label-sm text-on-surface-variant">
@@ -181,7 +249,8 @@ function SourceRunsPanel({ sourceId, colSpan }: { sourceId: string; colSpan: num
                   </ul>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </td>
@@ -1609,8 +1678,17 @@ function SourceFormDialog({
                           </span>
                           <span>Annunci unici: {testResult.uniqueAdsFound}</span>
                           <span>Modalità: {testResult.paginationMode}</span>
-                          <span>Arresto: {testResult.paginationStopReason}</span>
+                          <span>
+                            Arresto: {paginationStopDetails(testResult.paginationStopReason)?.label}
+                            {" "}
+                            <span>({testResult.paginationStopReason})</span>
+                          </span>
                         </div>
+                        {paginationStopDetails(testResult.paginationStopReason)?.suggestion && (
+                          <p className="mt-1 text-on-surface-variant">
+                            {paginationStopDetails(testResult.paginationStopReason)?.suggestion}
+                          </p>
+                        )}
                         {testResult.sampleUrl && (
                           <p className="font-mono text-on-surface-variant truncate">
                             Esempio: {testResult.sampleUrl}

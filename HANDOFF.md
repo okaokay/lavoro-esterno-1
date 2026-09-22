@@ -2167,6 +2167,30 @@ nell'audit. Verifica: Ruff superato e suite backend completa `292 passed`; i
 nuovi test coprono timeout sicuro, risposta incompleta e alterazione dei dati
 numerici.
 
+# Sessione 28 — 22 settembre 2026: paginazione browser affidabile
+
+La paginazione JavaScript comune ai mode `dynamic` e `stealth` non usa più un
+`element.click()` eseguito nel contesto della pagina. Il worker usa locator
+Playwright, click forzato quando il controllo riceve gli eventi e dispatch
+diretto quando un overlay lo copre. Dopo il click riacquisisce il DOM e rileva
+la transizione tramite URL, link annunci o digest del contenitore; sono inoltre
+supportati navigazione completa, aggiornamenti SPA e popup same-origin.
+
+Il generico `browser_pagination_failed` è stato sostituito da cause sicure e
+operative (`browser_click_failed`, `browser_navigation_timeout`,
+`next_control_detached`, `page_closed`, `browser_closed`,
+`cross_origin_popup` e `page_did_not_change`). La pagina Fonti mostra la
+descrizione italiana e un suggerimento, senza registrare eccezioni grezze,
+URL di navigazione o HTML.
+
+Verifica: Ruff superato; 27 test browser sintetici superati; lint frontend
+senza errori (restano due warning Fast Refresh preesistenti); build Vite e
+Docker riuscite. Un test live read-only sulla fonte configurata ha visitato
+due pagine in modalità `click`, raccolto 43 URL unici e concluso con
+`max_pages`, senza errori. API, frontend e worker scraper sono stati
+ricostruiti e risultano operativi; health API HTTP 200. Nessun volume è stato
+modificato o ricreato.
+
 # Sessione 28 — 18 settembre 2026: prefissi telefonici dal Paese della fonte
 
 La normalizzazione dei telefoni usa ora `phonenumbers` e il codice ISO
