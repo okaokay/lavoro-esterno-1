@@ -1864,6 +1864,90 @@ function DeleteSourceDialog({ source, onClose }: { source: Source | null; onClos
   );
 }
 
+function BulkDeleteSourcesDialog({
+  sources,
+  onDeleted,
+  onClose,
+}: {
+  sources: Source[];
+  onDeleted: (deletedIds: string[]) => void;
+  onClose: () => void;
+}) {
+  const deleteSource = useDeleteSource();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [failures, setFailures] = useState<{ name: string; message: string }[]>([]);
+  const [done, setDone] = useState(false);
+
+  function handleClose() {
+    setFailures([]);
+    setDone(false);
+    onClose();
+  }
+
+  async function handleConfirm() {
+    setIsDeleting(true);
+    setFailures([]);
+    const deletedIds: string[] = [];
+    const nextFailures: { name: string; message: string }[] = [];
+    for (const source of sources) {
+      try {
+        await deleteSource.mutateAsync(source.id);
+        deletedIds.push(source.id);
+      } catch (err) {
+        nextFailures.push({ name: source.name, message: describeError(err).description });
+      }
+    }
+    setIsDeleting(false);
+    setFailures(nextFailures);
+    setDone(true);
+    onDeleted(deletedIds);
+    if (nextFailures.length === 0) {
+      onClose();
+    }
+  }
+
+  return (
+    <Dialog open={sources.length > 0} onClose={handleClose} title="Elimina fonti selezionate">
+      <div className="flex flex-col gap-4">
+        {!done && (
+          <p className="text-body-md text-on-surface">
+            Eliminare <span className="font-semibold">{sources.length}</span> fonti selezionate?
+            L’operazione è bloccata, fonte per fonte, se esistono annunci collegati.
+          </p>
+        )}
+        {done && failures.length === 0 && (
+          <p className="text-body-md text-on-surface">Tutte le fonti selezionate sono state eliminate.</p>
+        )}
+        {failures.length > 0 && (
+          <div className="text-body-md text-error space-y-1">
+            <p>
+              {failures.length} fonti non eliminate
+              {sources.length - failures.length > 0 ? ` (${sources.length - failures.length} eliminate)` : ""}:
+            </p>
+            <ul className="list-disc pl-5">
+              {failures.map((f) => (
+                <li key={f.name}>
+                  {f.name}: {f.message}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="secondary" onClick={handleClose}>
+            {done ? "Chiudi" : "Annulla"}
+          </Button>
+          {!done && (
+            <Button type="button" variant="danger" onClick={handleConfirm} disabled={isDeleting}>
+              {isDeleting ? "Eliminazione…" : `Elimina ${sources.length} fonti`}
+            </Button>
+          )}
+        </div>
+      </div>
+    </Dialog>
+  );
+}
+
 function duplicateSlugSuggestion(source: Source, sources: Source[]): string {
   const used = new Set(sources.map((item) => item.code));
   for (let copyNumber = 1; ; copyNumber += 1) {
@@ -1981,6 +2065,7 @@ export default function SourcesPage() {
   const [importOpen, setImportOpen] = useState(false);
   const [formSource, setFormSource] = useState<Source | null | "new">(null);
   const [deleteTarget, setDeleteTarget] = useState<Source | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [duplicateTarget, setDuplicateTarget] = useState<Source | null>(null);
   const [robotsResultBySource, setRobotsResultBySource] = useState<Record<string, string>>({});
 
@@ -2040,6 +2125,16 @@ export default function SourcesPage() {
   const allSelected = Boolean(
     sources.data?.length && sources.data.every((source) => selectedIds.has(source.id)),
   );
+  const selectedSources = sources.data?.filter((source) => selectedIds.has(source.id)) ?? [];
+
+  function handleBulkDeleted(deletedIds: string[]) {
+    if (deletedIds.length === 0) return;
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      deletedIds.forEach((id) => next.delete(id));
+      return next;
+    });
+  }
 
   const cards: SummaryCardConfig[] = [
     { key: "total", label: "Fonti totali", value: summary.data?.total, accent: "border-t-primary" },
@@ -2078,6 +2173,14 @@ export default function SourcesPage() {
             >
               <Icon name="download" size={18} />
               Esporta tutte
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => setBulkDeleteOpen(true)}
+              disabled={selectedIds.size === 0}
+            >
+              <Icon name="delete" size={18} />
+              Elimina selezionate
             </Button>
             <Button onClick={() => setFormSource("new")}>
               <Icon name="add" size={18} />
@@ -2385,6 +2488,11 @@ export default function SourcesPage() {
         editingSource={formSource === "new" ? null : formSource}
       />
       <DeleteSourceDialog source={deleteTarget} onClose={() => setDeleteTarget(null)} />
+      <BulkDeleteSourcesDialog
+        sources={bulkDeleteOpen ? selectedSources : []}
+        onDeleted={handleBulkDeleted}
+        onClose={() => setBulkDeleteOpen(false)}
+      />
       <DuplicateSourceDialog
         source={duplicateTarget}
         sources={sources.data ?? []}
